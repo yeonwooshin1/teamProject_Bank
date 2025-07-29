@@ -17,5 +17,7 @@ public class ConsoleOtpSender implements OtpSender {
     @Override
     public void send(String dest, String code) {
         System.out.printf("[DEBUG] OTP to %s : %s%n", dest, code);          // 학습용: 콘솔 출력으로 전송 대체
+
+
     }
 }
