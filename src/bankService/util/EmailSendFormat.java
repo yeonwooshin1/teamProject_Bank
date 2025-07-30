@@ -16,5 +16,6 @@ public class EmailSendFormat {
             .append("• 실패 최대 횟수 : 3회\n\n")
             .append("항상 저희 은행을 이용해주셔서 감사합니다.")
             .toString();
+
     }   // func end
 }   // class end
