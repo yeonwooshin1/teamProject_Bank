@@ -1,0 +1,4 @@
+javax.mail-1.6.2.jar            => email 라이브러리
+mysql-connector-j-9.3.0.jar     => sql 연동 라이브러리
+opencsv-2.3.jar                 => csv 라이브러리
+추가중...
