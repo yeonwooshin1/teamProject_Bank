@@ -33,5 +33,6 @@ public final class OtpDto { // class start
                 + ", expiresAt=" + expiresAt
                 + ", attempts=" + attempts + "]";
 
+
     }
 }   // class end
