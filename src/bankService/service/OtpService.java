@@ -102,7 +102,7 @@ public class OtpService {   // class start
 
         // 모든 유효성 검사가 끝났다면 성공값 리턴과 검증 유효시간 설정
         // ** Instant.plus()  지정된 시각에 ()안의 값을 더해서 시각을 나타내는 메소드 **
-        // VALID_UNTIL : 위에 지정한 유효한 시간 상수값 ====> 현재 설정 5(분)
+        // VALID_UNTIL : 위에 지정한 유효한 시간 상수값 ====> 현재 설정 2(분)
         session.setTrustUntil(now.plus(VALID_UNTIL));
         return 5;   // println("OTP 인증이 성공적으로 완료되었습니다. * OTP 유효기간은 현재시각부터 5분입니다. *")
     }   // func end
