@@ -1,4 +1,4 @@
-package bankService.service;
+package bankService.service;    // package
 
 
 import bankService.model.dto.OtpDto;
@@ -8,7 +8,7 @@ import bankService.util.RandomUtil;
 import java.time.Duration;
 import java.time.Instant;
 
-public class OtpService {
+public class OtpService {   // class start
 
     // 절대 변하지 않는 상수
     private static final Duration INPUT_UNTIL = Duration.ofMinutes(2); // 발급 후 입력시간 2분 제한
