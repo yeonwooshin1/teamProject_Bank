@@ -1,37 +1,25 @@
 package bankService.model.dto;
 
 import java.time.Instant;
-import java.util.Objects;
 
-public final class OtpDto { // class start
+public class OtpDto {   // class start
     // 멤버변수
-    private final String userId;        // 사용자 ID
-    private final String otpHash;       // DB에 저장된 OTP 해시(SHA-256 등)
-    private final Instant expiresAt;    // 만료 시각(UTC 기준 Instant)
-    private final int attempts;         // 실패 시도 횟수
+    private String otpHashHex;     // 해시값 문자열
+    private Instant issuedAt;      // 발급 시각
+    private Instant submitUntil;   // 입력 마감 시각
+    private int attempts;          // 실패 시도 횟수
+    private Instant trustUntil;    // 검증 성공하면 유효시각
 
-    // 생성자
-    public OtpDto(String userId, String otpHash, Instant expiresAt, int attempts) {
-        this.userId = Objects.requireNonNull(userId, "userId");
-        this.otpHash = Objects.requireNonNull(otpHash, "otpHash");
-        this.expiresAt = Objects.requireNonNull(expiresAt, "expiresAt");
-        this.attempts = attempts;
-    }
-    // 파라미터로 입력된 값이 null이라면 NullPointerException(NPE)이 발생하고, 그렇지 않다면 입력값을 그래도 반환한다.
+    // setter getter
+    public String getOtpHashHex() { return otpHashHex; }
+    public void setOtpHashHex(String otpHashHex) { this.otpHashHex = otpHashHex; }
+    public Instant getIssuedAt() { return issuedAt; }
+    public void setIssuedAt(Instant issuedAt) { this.issuedAt = issuedAt; }
+    public Instant getSubmitUntil() { return submitUntil; }
+    public void setSubmitUntil(Instant submitUntil) { this.submitUntil = submitUntil; }
+    public int getAttempts() { return attempts; }
+    public void setAttempts(int attemptsUsed) { this.attempts = attemptsUsed; }
+    public Instant getTrustUntil() { return trustUntil; }
+    public void setTrustUntil(Instant trustUntil) { this.trustUntil = trustUntil; }
 
-    // getter
-    public String getUserId() { return userId; }
-    public String otpHash() { return otpHash; }
-    public Instant expiresAt() { return expiresAt; }
-    public int attempts() { return attempts; }
-
-    // toString
-    @Override
-    public String toString() {
-        return "OtpDTO[userId=" + userId
-                + ", otpHash=" + otpHash
-                + ", expiresAt=" + expiresAt
-                + ", attempts=" + attempts + "]";
-        //ㅁㅁ
-    }
 }   // class end

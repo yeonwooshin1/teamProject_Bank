@@ -12,8 +12,6 @@ public final class RandomUtil { // 난수 생성 class
     private static final SecureRandom RANDOM_DIGITS = new SecureRandom();
 
 
-
-
     // 난수 만들어주는 메소드
 
     // 매개변수 digits는 원하는 자리수임
