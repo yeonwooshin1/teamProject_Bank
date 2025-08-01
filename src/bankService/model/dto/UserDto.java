@@ -35,6 +35,9 @@ public class UserDto { // class start
         this.state = state;
     }
 
+    public UserDto(String u_id, String u_pwd) {
+    }
+
     // setter and getter
     public int getUno() {
         return uno;

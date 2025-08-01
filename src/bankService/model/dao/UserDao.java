@@ -1,64 +1,96 @@
 package bankService.model.dao;
 
+import bankService.controller.UserController;
+import bankService.model.dto.UserDto;
+
 import java.sql.*;
-import java.util.HashMap;
 
 public class UserDao { // class start
+
+    // 싱글톤
+    private UserDao(){}
+    private static final UserDao instance = new UserDao();
+    public static UserDao getInstance(){
+        return instance;
+    }
+
+    // UserDao 싱글톤 가져오기
+    private UserController userController = UserController.getInstance();
+
+
     // DB 연결 정보
     private static final String DB_URL = "jdbc:mysql://localhost:3306/bank";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "1234";
 
 
-    // 로그인 함수
-    public HashMap< String , Object > login(String u_id , String u_pwd ) throws SQLException {
+    // 로그인
+    public int login( UserDto dto) {
+        String sql = "SELECT COUNT(*) FROM user WHERE u_id = ? AND u_pwd = ?";
 
-        HashMap< String, Object > result = new HashMap<>();
+        try (
+                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                PreparedStatement preparedStatement = conn.prepareStatement(sql)
+        ) {
+            preparedStatement.setString(1, dto.getU_id());
+            preparedStatement.setString(2, dto.getU_pwd());
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-        String sql = "SELECT * FROM customer WHERE u_id = ? AND u_pwd = ?";
-
-        try {
-            Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            PreparedStatement preparedStatement = conn.prepareStatement(sql);
-
-            // ? 자리에 u_id , u_pwd 값 입력
-            preparedStatement.setString( 1 , u_id );
-            preparedStatement.setString( 2 , u_pwd );
-
-            // ResultSet : SQL 쿼리 결과를 담고 있는 객체
-            ResultSet rs = preparedStatement.executeQuery();
-
-            // rs.next : 다음 행(row)이 존재하면 true, 없으면 false를 반환
-            if( rs.next() ){
-                // result.put("컬럼명", rs.get자료형("컬럼명"))
-                // DB에서 불러온 각 컬럼 값을 HashMap에 저장
-                result.put("uno", rs.getInt("uno"));
-                result.put("u_id", rs.getString("u_id"));
-                result.put("u_pwd", rs.getString("u_pwd"));
-                result.put("u_name", rs.getString("u_name"));
-                result.put("phone", rs.getString("phone"));
-                result.put("u_email", rs.getString("u_email"));
-                result.put("u_date", rs.getDate("u_date"));
-
-
-            } // if end
-
-            rs.close();
-            preparedStatement.close();
-            conn.close();
-
-            return result;
-
-            // 안전하게 닫기
-            // 닫지 않으면 메모리 누수, 커넥션 부족, 서버 부하 등의 문제가 발생
-
-
-
-        }catch ( SQLException e ){
-            System.out.println( "SQLException 예외 오류 발생" );
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                return dto.getUno(); // 로그인 성공
+            }
+        } catch ( SQLException e ) {
+            System.out.println( "SQLException 오류 발생" );
         }
 
-
-        return result;
+        return 0; // 로그인 실패
     }
+
+    //----------------------------------------------------------------------------------------------------//
+
+    // 회원가입
+
+
+
+
+
+    //----------------------------------------------------------------------------------------------------//
+
+    // 아이디찾기
+
+
+
+
+
+
+
+
+
+
+
 } // class end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
