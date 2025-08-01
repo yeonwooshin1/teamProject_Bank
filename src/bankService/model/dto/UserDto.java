@@ -38,6 +38,9 @@ public class UserDto { // class start
     public UserDto(String u_id, String u_pwd) {
     }
 
+    public UserDto(String uId, String uPwd1, String uName, String phone, String uDate) {
+    }
+
     // setter and getter
     public int getUno() {
         return uno;
