@@ -30,7 +30,7 @@ public class UserController { // class start
 
         UserDto dto = new UserDto( u_id, u_pwd );
 
-        int result = userDao.login(dto);
+        int result = userDao.login( dto );
 
         if ( result == 1 ) {
             loginFailMap.put( u_id, 0 ); // 실패횟수 초기화
@@ -43,6 +43,9 @@ public class UserController { // class start
             return failCount; // 실패 횟수 반환
         }
     }
+
+
+
 
 
 } // class end
