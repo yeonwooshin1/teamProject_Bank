@@ -1,5 +1,6 @@
 package bankService.model.dto;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class UserDto { // class start
@@ -11,20 +12,12 @@ public class UserDto { // class start
     private String u_name;
     private String u_phone;
     private String u_email;
-    private LocalTime u_date;
+    private LocalDate u_date;
     private int state;
 
     // 생성자
-    public UserDto(String u_id, String u_pwd, String u_name, String u_phone, LocalTime u_date) {
-        this.u_id = u_id;
-        this.u_pwd = u_pwd;
-        this.u_name = u_name;
-        this.u_phone = u_phone;
-        this.u_date = u_date;
-    }
 
-
-    public UserDto(int uno, String u_id, String u_pwd, String u_name, String u_phone, String u_email, LocalTime u_date, int state) {
+    public UserDto( String u_id, String u_pwd, String u_name, String u_phone, String u_email, LocalDate u_date, int state) {
         this.uno = uno;
         this.u_id = u_id;
         this.u_pwd = u_pwd;
@@ -35,10 +28,20 @@ public class UserDto { // class start
         this.state = state;
     }
 
+    public UserDto(){}
     public UserDto(String u_id, String u_pwd) {
+        this.u_id = u_id;
+        this.u_pwd = u_pwd;
     }
 
-    public UserDto(String uId, String uPwd1, String uName, String phone, String uDate) {
+
+    public UserDto(String u_id, String u_pwd, String u_name, String u_phone, String u_email, LocalDate u_date) {
+        this.u_id = u_id;
+        this.u_pwd = u_pwd;
+        this.u_name = u_name;
+        this.u_phone = u_phone;
+        this.u_email = u_email;
+        this.u_date = u_date;
     }
 
     // setter and getter
@@ -78,11 +81,12 @@ public class UserDto { // class start
     public void setU_email(String u_email) {
         this.u_email = u_email;
     }
-    public LocalTime getU_date() {
-        return u_date;
+
+    public java.sql.Date getU_date() {
+        return java.sql.Date.valueOf(this.u_date);  // LocalDate → sql.Date 변환
     }
-    public void setU_date(LocalTime u_date) {
-        this.u_date = u_date;
+    public void setU_date(String u_date) {
+        this.u_date = LocalDate.parse(u_date);
     }
     public int getState() {
         return state;
