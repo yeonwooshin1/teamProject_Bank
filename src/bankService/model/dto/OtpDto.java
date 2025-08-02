@@ -32,6 +32,5 @@ public final class OtpDto { // class start
                 + ", otpHash=" + otpHash
                 + ", expiresAt=" + expiresAt
                 + ", attempts=" + attempts + "]";
-        //ㅁㅁ
     }
 }   // class end
