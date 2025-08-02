@@ -1,6 +1,8 @@
 package bankService.view;
 
 import bankService.controller.UserController;
+import bankService.model.dto.IdResponseDto;
+import bankService.model.dto.UserDto;
 
 import java.util.Scanner;
 
@@ -34,14 +36,18 @@ public class UserView { // class start
             System.out.println("==========================================");
 
             if (choose == 1) {
+
             } else if (choose == 2) {
+
             } else if (choose == 3) {
+
             } else if (choose == 4) {
+
             } else if (choose == 0) {
+
             }
         }
     }
-
 
 
 } // class end
