@@ -23,16 +23,24 @@ public class OtpService {   // class start
         return session;
     }   // func end
 
-
+    /* -------- 로그인 직후 trust 부여 -------- */
+    public synchronized void grantTrustNowForLogin() {
+        Instant now = Instant.now();
+        session = (session == null)? new OtpDto() : session;
+        session.setTrustUntil(now.plus(VALID_UNTIL));
+        session.setOtpHashHex(null);
+        session.setSubmitUntil(null);
+        session.setIssuedAt(null);
+        session.setAttempts(0);
+    }
 
 
     // otp 발행 메소드
-    public String issue() {
+    public synchronized String issue() {
         // 난수 생성 util 에서 가져온 메소드
         String otp = RandomUtil.createRandomNum(6);       // "111111" "123456" 같은 숫자 문자열
         // 해시 생성 util 에서 가져온 메소드
         String hashcode = HashUtil.sha256Hex(otp);              // 6자리 숫자 문자열을 해시화
-
         // Instant.now(); -> 이 객체를 컴파일한 지금 현재 시간을 담는 것
         // ** Instant : 날짜와 시간을 초단위(정확히는 나노초)로 표현하는 클래스 **
         Instant now = Instant.now();
@@ -63,7 +71,7 @@ public class OtpService {   // class start
 
     // 입력한 otp 값이 맞는지 확인하는 메소드
     // int 반환값 , 사용자가 입력한 inputOtp 를 매개변수로 사용
-    public int verify(String inputOtp) {
+    public synchronized int verify(String inputOtp) {
         // 혹시나 session 값이 없으면 1 반환
         if (session == null) return 1;  // println("OTP 세션이 존재하지 않거나 만료되었습니다. 새로운 OTP를 발급받아 주시기 바랍니다.")
 
@@ -145,5 +153,11 @@ public class OtpService {   // class start
         // 차이가 0 이라면 true 아니라면 false 반환
         return different == 0;
     }   // func end
+
+    public synchronized long getRemainingTrustSeconds() {
+        return (session==null||session.getTrustUntil()==null)? 0
+                : Math.max(0, session.getTrustUntil().getEpochSecond()
+                - Instant.now().getEpochSecond());
+    }
 
 }   // class end
