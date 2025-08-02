@@ -1,4 +1,4 @@
-package bankService.service;
+package bankService.service;    // package
 
 
 import bankService.model.dto.OtpDto;
@@ -8,7 +8,7 @@ import bankService.util.RandomUtil;
 import java.time.Duration;
 import java.time.Instant;
 
-public class OtpService {
+public class OtpService {   // class start
 
     // 절대 변하지 않는 상수
     private static final Duration INPUT_UNTIL = Duration.ofMinutes(2); // 발급 후 입력시간 2분 제한
@@ -102,7 +102,7 @@ public class OtpService {
 
         // 모든 유효성 검사가 끝났다면 성공값 리턴과 검증 유효시간 설정
         // ** Instant.plus()  지정된 시각에 ()안의 값을 더해서 시각을 나타내는 메소드 **
-        // VALID_UNTIL : 위에 지정한 유효한 시간 상수값 ====> 현재 설정 5(분)
+        // VALID_UNTIL : 위에 지정한 유효한 시간 상수값 ====> 현재 설정 2(분)
         session.setTrustUntil(now.plus(VALID_UNTIL));
         return 5;   // println("OTP 인증이 성공적으로 완료되었습니다. * OTP 유효기간은 현재시각부터 5분입니다. *")
     }   // func end
@@ -116,7 +116,7 @@ public class OtpService {
     public boolean checkValidUntil() {
         // if )) 만약 세션이 없거나 , 세션 검증 성공이 null(검증 전) 이면 false 반환
         if (session == null || session.getTrustUntil() == null) return false;
-        // now(현재 시각)보다 dto에 저장된 검증 성공 시간 (발급 후 5분)보다 이후가 아니라면 true 아니면 false를 반환
+        // now(현재 시각)보다 dto에 저장된 검증 성공 시간 (발급 후 2분)보다 이후가 아니라면 true 아니면 false를 반환
         return !Instant.now().isAfter(session.getTrustUntil());
     }   // func end
 
@@ -138,7 +138,7 @@ public class OtpService {
 
         // a.charAt(i) ^ b.charAt(i) : 두 문자의 코드 포인트를 비트 단위로 비교 , 같으면 결과 0, 다르면 0 이외의 값
         // different |= ... : 이전까지의 누적값(different)에 새 차이값을 OR 연산이라네요.
-        // 즉 한 번이라도 달랐으면 diff 에 0 이외의 비트가 남음
+        // 즉 한 번이라도 달랐으면 different 에 0 이외의 비트가 남음
         for (int i = 0; i < a.length(); i++) {
             different |= a.charAt(i) ^ b.charAt(i);
         }   // for end
