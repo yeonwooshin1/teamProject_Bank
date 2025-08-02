@@ -1,9 +1,11 @@
 package bankService.model.dao;
 
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 
 public class AccountDao {
     // 입금 , 출금 , 이체 , 거래내역 저장 담당 dao
@@ -59,21 +61,11 @@ public class AccountDao {
             }
 
         }catch (Exception e){
-            System.out.println("잔액 조회 실패" + e );
+            System.out.println("잔액 계산 실패" + e );
         }
         return balance;
     } // func e
 
-
-    // 입금 메소드
-    public boolean deposit(){
-
-        return true;
-    }
-
-    // 출금 메소드
-
-    // 이체 메소드
 
     // 거래내역 저장 메소드
     public boolean saveTransaction(int from , int to , int amount  , String memo , String type  ){
