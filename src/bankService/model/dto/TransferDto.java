@@ -7,4 +7,8 @@ public class TransferDto {
     private String account_pwd;     // 계좌 비밀번호
     private int amount;             // 이체 할 금액
     private String t_text;          // 이체 시 메모
+
+    // 생성자
+
+    // getter , setter , toString
 }

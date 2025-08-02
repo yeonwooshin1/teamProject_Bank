@@ -6,4 +6,6 @@ public class TransferResultDto {
     private String message;     // 안내 메시지
     private int balance;         // 이체 후 남은 잔액
 
+
+
 }
