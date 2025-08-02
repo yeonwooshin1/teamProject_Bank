@@ -37,7 +37,20 @@ public class AccountDao {
     } // func e
 
 
-    // 계좌 조회 메소드
+    // 계좌 유효성 검사
+    public boolean isAccount(String account_no , String account_pwd ){
+        try {
+            String sql = "select * from account where account_no = ? and account_pwd = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ps.setString(2, account_pwd);
+            ResultSet rs = ps.executeQuery();
+            return rs.next(); // 계좌 존재하면 true
+        }catch (Exception e ){
+            System.out.println("계좌 조회 실패" + e);
+        }
+        return false;
+    } // func e
 
 
     // 잔액 계산 메소드
@@ -72,15 +85,16 @@ public class AccountDao {
         try {
 
             String sql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
-                    "values ( ? , ? , ? , ? . ? now())";
+                    "values ( ? , ? , ? , ? , ? now())";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, from);
             ps.setInt(2, to);
             ps.setInt(3, amount);
-            ps.setString(4, memo);
-            ps.setString(5, type);
+            ps.setString(4, type);
+            ps.setString(5, memo);
             ps.executeUpdate();
             return true;
+
         }catch (Exception e ){
             System.out.println("테이블 저장 실패 " +e);
             return false;
