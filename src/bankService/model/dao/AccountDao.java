@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 
 
 public class AccountDao {
-    // 입금 , 출금 , 이체 , 거래내역 저장 담당 dao
+    // 계좌 유효성 검사 , 잔액 계산  , 거래내역 저장 , 계좌 번호로 계좌 로그번호 가져오는 dao
 
     // 싱글톤 생성
     private AccountDao(){
