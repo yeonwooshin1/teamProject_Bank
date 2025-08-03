@@ -32,7 +32,7 @@ create table transaction(
     to_acno int not null ,									-- 입금 계좌 로그번호
     amount bigint not null ,									-- 거래 금액
 	type enum('입금' , '출금' , '이체' ) not null,				-- 입/출금 유형( 1 : 출금 , 2 : 입금 , 3 : 이체 )
-	memo varchar(100) not null,								-- 거래 메모
+	memo varchar(100) ,										-- 거래 메모
     t_date datetime not null default CURRENT_TIMESTAMP, 	-- 입/출금 날짜
     constraint primary key (tno),							-- 내역 로그번호 pk
 	foreign key (from_acno) references account(acno),		-- 출금계좌 fk
@@ -188,7 +188,8 @@ INSERT INTO account (uno, account_no, account_pwd) VALUES
 (67,'111-262-834195','453601'),
 (68,'111-277-675142','139705'),
 (69,'111-258-342809','560127'),
-(70,'111-294-130376','693842');
+(70,'111-294-130376','693842')
+;
 
 
 INSERT INTO transaction (from_acno, to_acno, amount, type, memo, t_date) VALUES

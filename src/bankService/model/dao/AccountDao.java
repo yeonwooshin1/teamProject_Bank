@@ -37,7 +37,7 @@ public class AccountDao {
     } // func e
 
 
-    // 계좌 유효성 검사
+    // 계좌 유효성 검사 (입금 , 출금 , 이체할 계좌 조회 시)
     public boolean isAccount(String account_no , String account_pwd ){
         try {
             String sql = "select * from account where account_no = ? and account_pwd = ?";
@@ -52,6 +52,19 @@ public class AccountDao {
         return false;
     } // func e
 
+    // 비밀번호 없이 계좌번호 만으로 유효성 검사 (이체 받는 계좌 조회 시)
+    public boolean receiveAccount(String account_no){
+        try {
+            String sql = "select * from account where account_no = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }catch (Exception e ){
+            System.out.println(e);
+        }
+        return false;
+    } // func e
 
     // 잔액 계산 메소드
     public int isBalance(int acno){

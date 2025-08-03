@@ -103,7 +103,7 @@ public class AccountController {
         } // if e
 
         // 이체 받을 계좌 확인
-        boolean isVaildReceiver = accountDao.isAccount( receiverNo , null);
+        boolean isVaildReceiver = accountDao.receiveAccount( receiverNo );
         if(!isVaildReceiver){
             return new TransferResultDto(false, "이체받을 계좌가 존재하지 않습니다." , -1);
         } // if e
