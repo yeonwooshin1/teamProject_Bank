@@ -46,19 +46,20 @@ public class BankView {
 
     }
 
-    public void AccountDel(){
+    public void AccountDel() {
         System.out.print("해지할 계좌번호 : ");
         String account_no = sc.next();
         System.out.print("계좌 비밀번호 입력 : ");
         String account_pwd = sc.next();
 
-        boolean result = ac.AccountDel(account_no,account_pwd);
+        boolean result = ac.AccountDel(account_no, account_pwd);
 
-        if (result){
+        if (result) {
             System.out.println("계좌 해지 성공");
-        }else {
+        } else {
             System.out.println("계좌 해지 실패 ");
 
+        }
     }
 
     public void AccountList() {

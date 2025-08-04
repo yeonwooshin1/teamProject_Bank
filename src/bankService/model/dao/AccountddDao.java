@@ -94,8 +94,8 @@ public class AccountddDao {
         try {
             String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, account_no);
-            ps.setString(2, account_pwd);
+            ps.setString(1, dto.getAccount_no());
+            ps.setString(2, dto.getAccount_pwd());
 
             int result = ps.executeUpdate();
             if (result == 1) {
