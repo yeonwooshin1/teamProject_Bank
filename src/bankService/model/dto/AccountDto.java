@@ -9,12 +9,13 @@ public class AccountDto {
     private int amount;          // 거래 금액
     private String memo;         // 메모
     private String t_date;       // 거래 일자
-    private String account_pwd;
+    private String account_pwd; // 비밀번호
+    private int uno;
 
     public AccountDto() {
     }
 
-    public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date , String account_pwd) {
+    public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date , String account_pwd , int uno) {
         this.tno = tno;
         this.account_no = account_no;
         this.from_acno = from_acno;
@@ -24,12 +25,7 @@ public class AccountDto {
         this.memo = memo;
         this.t_date = t_date;
         this.account_pwd = account_pwd;
-    }
-
-    public AccountDto(int tno, String accountNo, int fromAcno, int toAcno, String type, int amount, String memo, String tDate) {
-    }
-
-    public AccountDto(String accountPwd) {
+        this.uno =  uno;
     }
 
     public int getTno() {
@@ -104,6 +100,14 @@ public class AccountDto {
         this.account_pwd = account_pwd;
     }
 
+    public int getUno() {
+        return uno;
+    }
+
+    public void setUno(int uno) {
+        this.uno = uno;
+    }
+
     @Override
     public String toString() {
         return "AccountDto{" +
@@ -116,6 +120,7 @@ public class AccountDto {
                 ", memo='" + memo + '\'' +
                 ", t_date='" + t_date + '\'' +
                 ", account_pwd='" + account_pwd + '\'' +
+                ", uno=" + uno +
                 '}';
     }
 }

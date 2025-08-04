@@ -9,15 +9,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-public class AccountDao {
+public class AccountddDao {
     // 입금 , 출금 , 이체 , 거래내역 저장 담당 dao
 
     // 싱글톤 생성
-    private AccountDao(){
+    private AccountddDao(){
         connect();
     }
-    private static final AccountDao instance = new AccountDao();
-    public static AccountDao getInstance(){
+    private static final AccountddDao instance = new AccountddDao();
+    public static AccountddDao getInstance(){
         return instance;
     }
 
@@ -32,9 +32,11 @@ public class AccountDao {
     private void connect(){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("mysql 드라이버 연결 성공");
             conn = DriverManager.getConnection(db_url , db_user ,db_password);
+            System.out.println("db연결 성공");
         }catch (Exception e){
-            System.out.println(e);
+            System.out.println("db연결 실패"+ e);
         }
     } // func e
 
@@ -59,7 +61,7 @@ public class AccountDao {
 
 
     // 계좌 생성
-    public boolean AccountAdd(String account_pwd) {
+    public boolean AccountAdd(AccountDto accountDto) {
         try {
             String account_no = AccountUtil.generateAccountNumber();
 
@@ -68,10 +70,11 @@ public class AccountDao {
                 account_no = AccountUtil.generateAccountNumber();
             }
 
-            String sql = "INSERT INTO account ( account_no, account_pwd) VALUES ( ?, ?)";
+            String sql = "INSERT INTO account ( uno , account_no, account_pwd) VALUES (? , ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, account_no);
-            ps.setString(2, account_pwd);
+            ps.setInt(1, accountDto.getUno());
+            ps.setString(2, account_no);
+            ps.setString(3, accountDto.getAccount_pwd());
 
             int result = ps.executeUpdate();
             if (result == 1) {
@@ -87,7 +90,7 @@ public class AccountDao {
     }
 
     // 계좌 해지
-    public boolean AccountDel(String account_no, String account_pwd) { // 계좌번호 , 패스워드
+    public boolean AccountDel(AccountDto dto) { // 계좌번호 , 패스워드
         try {
             String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -107,6 +110,7 @@ public class AccountDao {
         }
     }
 
+/*
     // 계좌 조회 메소드
     // 계좌 조회
     public ArrayList<AccountDto> AccountList(String account_no) {
@@ -148,4 +152,6 @@ public class AccountDao {
     public boolean AccountAdd(AccountDto accountDto) {
         return false;
     }
+
+ */
 } // class e

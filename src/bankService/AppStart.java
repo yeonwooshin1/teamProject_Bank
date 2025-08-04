@@ -1,21 +1,30 @@
 package bankService;
 
-import bankService.controller.UserController;
-import bankService.model.dto.UserDto;
-import bankService.view.UserView;
 
-import java.util.ArrayList;
+import bankService.View.BankView;
+import bankService.controller.AccountddController;
+import bankService.model.dao.AccountddDao;
+
 
 public class AppStart {
     public static void main(String[] args) {
-        //UserView.getInstance().index();
 
-        // (1) 테스트할 컨트롤러 싱글톤 가져오기
-        UserController userController = UserController.getInstance();
-//      // (2) 주석 처리 하면서 단위 기능 테스트
-//          // 1) 로그인 테스트
-        int result = userController.login("user001", "1234");
-        System.out.println(result);
+         BankView.getInstance().index();
+
+//        AccountddDao dao = AccountddDao.getInstance();  // 싱글톤이라 가정
+//
+//
+//        // 계좌 등록 테스트
+//        AccountddController controller = AccountddController.getInstance();
+//        String testPwd = "test1234";
+//        boolean result = controller.AccountAdd(testPwd);
+//
+//        if(result){
+//            System.out.println("계좌 등록 성공");
+//        }else {
+//            System.out.println("계좌 등록 실패");
+//        }
+
 
     }
 }
