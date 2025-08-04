@@ -24,5 +24,12 @@ public class AccountController {
 
 
 
+    // 계좌번호 중복 검증
+
+    // 계좌 생성
+
+    // 계좌 해지
+
+    // 계좌 조회
 
 }
