@@ -47,6 +47,7 @@ public class AppStart {
             System.err.println("[예상치 못한 오류] " + e.getMessage());
             e.printStackTrace();
         }
-    }
 
-}
+    } // main e
+
+} // class e
