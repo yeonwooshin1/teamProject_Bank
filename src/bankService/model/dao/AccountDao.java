@@ -1,9 +1,10 @@
 package bankService.model.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import bankService.model.dto.AccountDto;
+import bankService.util.AccountUtil;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 public class AccountDao {
     // 입금 , 출금 , 이체 , 거래내역 저장 담당 dao
@@ -34,67 +35,111 @@ public class AccountDao {
         }
     } // func e
 
-
-    // 계좌 조회 메소드
-
-
-    // 잔액 계산 메소드
-    public int isBalance(int acno){
-        int balance = 0;    // 잔액 초기화
-
+    // 계좌번호 중복 검증
+    public boolean AccountCheck(String account_no) {
         try {
-            String sql = "select from_acno , to_acno , amount from transaction where from_acno = ? or to_acno = ?";
+            String sql = "SELECT COUNT(*) FROM account WHERE account_no = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1 , acno);
-            ps.setInt(2, acno);
+            ps.setString(1, account_no);
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next() ){
-                int from = rs.getInt("from_acno");
-                int to = rs.getInt("to_acno");
-                int amount = rs.getInt("amount");
-
-                if( acno == to )balance += amount;   // 조회하는 계좌로그번호가 to_acno에 있으면 금액만큼 누적 더하기
-                if( acno == from )balance -= amount; // 조회하는 계좌로그번호가 from_acno에 있으면 금액만큼 누적 빼기
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count == 0;  // 0이면 사용가능, 1 이상이면 중복됨
             }
 
-        }catch (Exception e){
-            System.out.println("잔액 조회 실패" + e );
+        } catch (Exception e) {
+            System.out.println("계좌 중복 검증 실패: " + e);
         }
-        return balance;
-    } // func e
-
-
-    // 입금 메소드
-    public boolean deposit(){
-
-        return true;
+        return false; // 중간에 문제 생기면 false
     }
 
-    // 출금 메소드
 
-    // 이체 메소드
-
-    // 거래내역 저장 메소드
-    public boolean saveTransaction(int from , int to , int amount  , String memo , String type  ){
+    // 계좌 생성
+    public boolean AccountAdd(String account_pwd , int uno) {
         try {
+            String account_no = AccountUtil.generateAccountNumber();
 
-            String sql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
-                    "values ( ? , ? , ? , ? . ? now())";
+            // 중복되지 않는 계좌번호 생성
+            while (!AccountCheck(account_no)) {  // 중복이면 다시 생성
+                account_no = AccountUtil.generateAccountNumber();
+            }
+
+            String sql = "INSERT INTO account (uno, account_no, account_pwd) VALUES (?, ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, from);
-            ps.setInt(2, to);
-            ps.setInt(3, amount);
-            ps.setString(4, memo);
-            ps.setString(5, type);
-            ps.executeUpdate();
-            return true;
-        }catch (Exception e ){
-            System.out.println("테이블 저장 실패 " +e);
+            ps.setInt(1, uno);
+            ps.setString(2, account_no);
+            ps.setString(3, account_pwd);
+
+            int result = ps.executeUpdate();
+            if (result == 1) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.out.println("계좌 등록 실패: " + e);
             return false;
         }
-    } // func e
+    }
 
+    // 계좌 해지
+    public boolean AccountDel(String account_no, String account_pwd) { // 계좌번호 , 패스워드
+        try {
+            String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ps.setString(2, account_pwd);
 
+            int result = ps.executeUpdate();
+            if (result == 1) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            System.out.println("계좌 해지 실패: " + e);
+            return false;
+        }
+    }
+
+    // 계좌 조회
+    public ArrayList<AccountDto> AccountList(String account_no) {
+        ArrayList<AccountDto> list = new ArrayList<>();
+
+        try {
+            // 거래 내역 조회 (특정 계좌 기준, 최신순)
+            String sql = "SELECT t.tno, a.account_no, t.from_acno, t.to_acno, t.type, t.amount, t.memo, t.t_date " +
+                    "FROM transaction t " +
+                    "JOIN account a ON t.from_acno = a.acno OR t.to_acno = a.acno " +
+                    "WHERE a.account_no = ? " +
+                    "ORDER BY t.t_date DESC";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                AccountDto dto = new AccountDto(
+                        rs.getInt("tno"),              // 거래 번호
+                        rs.getString("account_no"),    // 계좌번호
+                        rs.getInt("from_acno"),        // 출금 계좌
+                        rs.getInt("to_acno"),          // 입금 계좌
+                        rs.getString("type"),          // 거래 유형
+                        rs.getInt("amount"),           // 거래 금액
+                        rs.getString("memo"),          // 메모
+                        rs.getString("t_date")         // 거래 일자
+                );
+
+                list.add(dto); // 리스트 추가
+            }
+
+        } catch (Exception e) {
+            System.out.println("거래내역 조회 실패: " + e);
+        }
+
+        return list;
+    }
 
 } // class e

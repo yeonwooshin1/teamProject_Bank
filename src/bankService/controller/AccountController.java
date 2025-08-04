@@ -1,6 +1,7 @@
 package bankService.controller;
 
 import bankService.model.dao.AccountDao;
+import bankService.model.dto.AccountDto;
 
 public class AccountController {
 
@@ -15,12 +16,15 @@ public class AccountController {
     public AccountDao accountDao = AccountDao.getInstance();
 
 
+    // 계좌 중복 여부
 
-    // 입금 메소드
+    // 계좌 등록
+    public boolean AccountAdd(String account_pwd){
+        AccountDto accountDto = new AccountDto(account_pwd);
+        boolean result = accountDao.AccountAdd(accountDto);
+    }
+    // 계좌 해지
 
-    // 출금 메소드
-
-    // 이체 메소드
 
 
 
