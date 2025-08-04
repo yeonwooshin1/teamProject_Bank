@@ -14,7 +14,7 @@ public class AccountDto {
 
     public AccountDto() {
     }
-
+asdasd
     public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date , String account_pwd , int uno) {
         this.tno = tno;
         this.account_no = account_no;
