@@ -74,7 +74,7 @@ public class AccountController {
         // 잔액 확인 및 잔액 업데이트
         int balance = accountDao.isBalance(from_acno);
         if (balance < amount ){
-            return new TransactionResultDto(false , "잔액이 부족합니다." , -1);
+            return new TransactionResultDto(false , "잔액이 부족합니다." , balance);
         } // if e
 
         // 거래내역 저장

@@ -85,6 +85,8 @@ public class AccountDao {
                 if( acno == to )balance += amount;   // 조회하는 계좌로그번호가 to_acno에 있으면 금액만큼 누적 더하기
                 if( acno == from )balance -= amount; // 조회하는 계좌로그번호가 from_acno에 있으면 금액만큼 누적 빼기
             }
+            rs.close();
+            ps.close();
 
         }catch (Exception e){
             System.out.println("잔액 계산 실패" + e );
