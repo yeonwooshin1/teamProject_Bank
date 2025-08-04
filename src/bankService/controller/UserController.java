@@ -19,9 +19,6 @@ public class UserController { // class start
         return instance;
     }
 
-    // 추가 : 로그인 사용자 정보 static 변수
-    private static int loginUno = 0;
-    private static String loginUid = null;
 
     //싱글톤 가져오기
     private UserDao userDao = UserDao.getInstance();

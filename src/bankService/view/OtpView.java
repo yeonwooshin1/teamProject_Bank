@@ -28,6 +28,7 @@ public class OtpView {
         this.ioLock     = ioLock;
     }
 
+
     /** [차단형] 재인증 처리 */
     public void forceReauth() {
         if (otpService.checkValidUntil()) return; // 이미 신뢰 중이면 패스
@@ -45,12 +46,21 @@ public class OtpView {
 
             switch (code) {
                 case 4 -> say("❌ OTP 불일치. 다시 시도해 주세요.");
-                case 3 -> { say("⛔ 실패 횟수 초과. 새 OTP 발급.");
+                case 3 -> {
+                    say("⛔ 실패 횟수 초과. 새 OTP 발급.");
                     otpDev = otpService.reissue();
-                    say("▶ [DEV] 새 OTP: " + otpDev + " (2분 내 입력)"); }
-                case 2, 1, default -> { say("⏰/⚠️ 세션 없음/만료. 새 OTP 발급.");
+                    say("▶ [DEV] 새 OTP: " + otpDev + " (2분 내 입력)");
+                }
+                case 1, 2 -> {
+                    say("⏰ 세션 없음 또는 만료. 새 OTP 발급.");
                     otpDev = otpService.reissue();
-                    say("▶ [DEV] 새 OTP: " + otpDev + " (2분 내 입력)"); }
+                    say("▶ [DEV] 새 OTP: " + otpDev + " (2분 내 입력)");
+                }
+                default -> {
+                    say("⚠️ 알 수 없는 코드. 새 OTP 발급.");
+                    otpDev = otpService.reissue();
+                    say("▶ [DEV] 새 OTP: " + otpDev + " (2분 내 입력)");
+                }
             }
         }
     }

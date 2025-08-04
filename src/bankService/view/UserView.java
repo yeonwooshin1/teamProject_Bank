@@ -1,8 +1,8 @@
 package bankService.view;
 
+import bankService.controller.OtpController;
 import bankService.controller.UserController;
 import bankService.model.dto.IdResponseDto;
-import bankService.util.ConsoleStatus;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -18,14 +18,20 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-    private Scanner scan; private ConsoleStatus status; private Object ioLock;
+    private Scanner scan; private Object ioLock;
 
 
     // 싱글톤 가져오기
     UserController userController = UserController.getInstance();
+    OtpController otpController = OtpController.getInstance();
 
+    // wire
+    public void wire(Scanner scan , Object ioLock){
+        this.scan = scan;
+        this.ioLock = ioLock;
+    }   // wire end
 
-    public void index() {
+    public int index() {
         synchronized (ioLock) {
             try {
                 System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
@@ -41,34 +47,133 @@ public class UserView { // class start
                 System.out.println("==========================================");
 
                 if (choose == 1) {
-                    login();
+                    int result = login();
+                    return result;
                 } else if (choose == 2) {
                     register();
+                    return 0;
                 } else if (choose == 3) {
                     findId();
+                    return 0;
                 } else if (choose == 4) {
                     findPassword();
+                    return 0;
                 } else if (choose == 0) {
-                    return;
+                    return -1;
+                }
+                else {
+                    System.out.println("[경고] 메뉴에 있는 숫자를 입력해주세요.");
+                    return 0;
                 }
             } catch (InputMismatchException e) {
                 System.out.println("[경고] 숫자만 입력하세요.");
                 scan.nextLine();
+                return 0;
             }   // catch end
+        }   // synchronized end
+    }   // func end
+
+    // 1. 로그인
+    public int login() {
+        System.out.print("아이디를 입력해주세요.: ");
+        String u_id = scan.next();
+        System.out.print("비밀번호를 입력해주세요.: ");
+        String u_pwd = scan.next();
+        int result = userController.login(u_id, u_pwd);
+        if (result == -1) {
+            System.out.println("로그인 5회 시도했습니다.");
+            return result;
+        }
+        else if (result == 0) {
+            System.out.println("로그인 실패했습니다.");
+            return result;
+        }
+
+        if (otpRequiredPrompt()) {
+            boolean success = handleOtpProcess(result);
+            return success ? result : 0;
+        } else {
+            System.out.println("로그인창으로 이동합니다.");
+            return 0;
+        }
+    }   // func end
+
+    private boolean otpRequiredPrompt() {
+        while (true) {
+            System.out.println("안전한 서비스 이용을 위해 최초 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
+            System.out.print(" Y / N : ");
+            String choose = scan.next();
+
+            if ("Y".equalsIgnoreCase(choose)) return true;
+            else if ("N".equalsIgnoreCase(choose)) return false;
+            else System.out.println("Y 또는 N 중에 선택해주세요.");
         }
     }
 
-    // 1. 로그인
-    public void login() {
-        System.out.print("아이디: ");
-        String u_id = scan.next();
-        System.out.print("비밀번호: ");
-        String u_pwd = scan.next();
-        int result = userController.login(u_id, u_pwd);
-        if (result == -1) System.out.println("로그인 5회 시도했습니다.");
-        else if (result == 0) System.out.println("로그인 실패했습니다.");
-        else System.out.println("로그인 성공했습니다.");
+    private boolean handleOtpProcess(int uno) {
+        while (true) {
+            String email = otpController.findEmail(uno);
+            otpController.getIssue(email);
+            System.out.println("회원님의 이메일로 OTP 인증 메일을 발송했습니다.");
+
+            boolean verified = handleOtpInput();
+            if (verified) return true;
+
+            // 인증 실패 후 재발급 여부
+            System.out.print("OTP를 재발급 받으시겠습니까? Y / N : ");
+            String re = scan.next();
+            if (!"Y".equalsIgnoreCase(re)) {
+                System.out.println("로그인창으로 이동합니다.");
+                return false;
+            }
+        }
     }
+
+
+    private boolean handleOtpInput() {
+        int attempts = 0;
+
+        while (true) {
+            System.out.print("OTP를 입력해주세요: ");
+            String otpInput = scan.next();
+
+            int otpResult = otpController.verifyOtp(otpInput);
+
+            switch (otpResult) {
+                case 1 -> {
+                    System.out.println("OTP 세션이 존재하지 않거나 만료되었습니다.");
+                    return false;
+                }
+                case 2 -> {
+                    System.out.println("OTP 입력 유효 시간이 경과되었습니다.");
+                    return false;
+                }
+                case 3 -> {
+                    System.out.println("OTP 입력 시도 횟수를 초과하였습니다.");
+                    return false;
+                }
+                case 4 -> {
+                    System.out.println("OTP가 일치하지 않습니다. 다시 시도해주세요.");
+                    if (++attempts >= 3) {
+                        System.out.println("입력을 너무 많이 실패했습니다.");
+                        return false;
+                    }
+                    // 재입력 허용
+                }
+                case 5 -> {
+                    System.out.println("OTP 인증이 성공적으로 완료되었습니다.");
+                    return true;
+                }
+                default -> {
+                    System.out.println("알 수 없는 오류입니다. 다시 시도해주세요.");
+                    return false;
+                }
+            }
+        }
+    }
+
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 2. 회원가입
     public void register() {
@@ -84,29 +189,37 @@ public class UserView { // class start
         String phone = scan.next();
         System.out.print("이메일: ");
         String email = scan.next();
+        // 형식 맞춰서 입력 받음
         System.out.print("생년월일(yyyy-MM-dd): ");
         String u_date = scan.next();
         int result = userController.registerMember(u_id, u_pwd1, u_pwd2, u_name, phone, email, u_date);  // ← dto와 비번확인 함께 전달 // 비밀번호 확인까지 같이 전달
+        // switch 문을 사용하면 result 값에 따라서 출력하는 메세지가 달라짐
         switch (result) {
-            case 1 -> System.out.println("회원가입 성공했습니다.");
+            case 1  -> System.out.println("회원가입 성공했습니다.");
             case -1 -> System.out.println("중복된 아이디가 존재합니다.");
             case -2 -> System.out.println("입력하신 두 비밀번호가 일치하지 않습니다.");
             case -3 -> System.out.println("형식 오류가 발생했습니다.");
         }
-    }
+    } // func end
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 3. 아이디 찾기
     public void findId() {
         System.out.print("이름: ");
-        String u_name = scan.next();
+        String u_name = scan. next();
         System.out.print("전화번호: ");
         String u_phone = scan.next();
         IdResponseDto result = userController.findId(u_name, u_phone);
         if (result != null)
-            System.out.println("당신의 아이디는: " + result.getU_id());
+            // DB 에서 확인받아서 줘야 하니까
+            System.out.println("당신의 아이디는: " + result.getU_id() + "입니다.");
         else
             System.out.println("일치하는 회원 정보가 없습니다.");
-    }
+    } // func end
+
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 4. 비밀번호 찾기
     public void findPassword() {
@@ -119,41 +232,19 @@ public class UserView { // class start
             System.out.print("새 비밀번호: ");
             String newPwd = scan.next();
             int result = userController.updatePassword(u_id, newPwd);
-            if (result == 1) System.out.println("비밀번호 변경이 완료되었습니다.");
-            else System.out.println("비밀번호 변경에 실패했습니다.");
+            // if 안에 if
+            if (result == 1)
+                System.out.println("비밀번호 변경이 완료되었습니다.");
+            else
+                System.out.println("비밀번호 변경에 실패했습니다.");
         } else {
             System.out.println("입력 정보에 맞는 계정을 찾을 수 없습니다.");
-        }
-    }
+        } // if end
+    } // func end
 
-    // 5. 비밀번호 변경
-    public void changePassword() {
-        System.out.print("아이디: ");
-        String u_id = scan.next();
-        System.out.print("현재 비밀번호: ");
-        String u_pwd = scan.next();
-        boolean check = userController.verifyPassword(u_id, u_pwd);
-        if (check) {
-            System.out.print("새 비밀번호: ");
-            String newPwd = scan.next();
-            boolean result = userController.update2Password(u_id, newPwd);
-            if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-            else System.out.println("비밀번호 변경에 실패했습니다.");
-        } else {
-            System.out.println("비밀번호가 일치하지 않습니다.");
-        }
-    }
 
-    // 6. 회원 탈퇴
-    public void deleteAccount() {
-        // 로그인된 사용자의 id가 있다고 가정, 여기는 직접 입력 받음
-        System.out.print("아이디: ");
-        String u_id = scan.next();
-        System.out.print("비밀번호: ");
-        String u_pwd = scan.next();
-        boolean result = userController.deleteAccount(u_id, u_pwd);
-        if (result) System.out.println("탈퇴 성공했습니다.");
-        else System.out.println("탈퇴 실패했습니다.");
-    }
+    //----------------------------------------------------------------------------------------------------//
+
+
 
 } // class end
