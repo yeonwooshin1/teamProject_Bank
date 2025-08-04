@@ -29,6 +29,9 @@ public class AccountDto {
     public AccountDto(int tno, String accountNo, int fromAcno, int toAcno, String type, int amount, String memo, String tDate) {
     }
 
+    public AccountDto(String accountPwd) {
+    }
+
     public int getTno() {
         return tno;
     }

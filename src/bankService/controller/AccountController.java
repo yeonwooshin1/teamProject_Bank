@@ -22,9 +22,9 @@ public class AccountController {
     public boolean AccountAdd(String account_pwd){
         AccountDto accountDto = new AccountDto(account_pwd);
         boolean result = accountDao.AccountAdd(accountDto);
+        return result;
     }
     // 계좌 해지
-asdasd
 
 
 

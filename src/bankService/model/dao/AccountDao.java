@@ -59,7 +59,7 @@ public class AccountDao {
 
 
     // 계좌 생성
-    public boolean AccountAdd(String account_pwd , int uno) {
+    public boolean AccountAdd(String account_pwd) {
         try {
             String account_no = AccountUtil.generateAccountNumber();
 
@@ -68,11 +68,10 @@ public class AccountDao {
                 account_no = AccountUtil.generateAccountNumber();
             }
 
-            String sql = "INSERT INTO account (uno, account_no, account_pwd) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO account ( account_no, account_pwd) VALUES ( ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setInt(1, uno);
-            ps.setString(2, account_no);
-            ps.setString(3, account_pwd);
+            ps.setString(1, account_no);
+            ps.setString(2, account_pwd);
 
             int result = ps.executeUpdate();
             if (result == 1) {
@@ -146,4 +145,7 @@ public class AccountDao {
         return list;
     }
 
+    public boolean AccountAdd(AccountDto accountDto) {
+        return false;
+    }
 } // class e
