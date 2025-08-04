@@ -1,19 +1,22 @@
 package bankService.model.dto;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+
+//UserDto
+//DB에서 가져오거나, DB에 저장할 “회원 정보”를 담는 데이터 객체
+//오직 데이터 보관/이동만 담당(비즈니스 로직 없음).
 
 public class UserDto { // class start
 
     // 멤버변수
-    private int uno;
-    private String u_id;
-    private String u_pwd;
-    private String u_name;
-    private String u_phone;
-    private String u_email;
-    private LocalDate u_date;
-    private int state;
+    private int uno; // 회원번호
+    private String u_id; // 회원 아이디
+    private String u_pwd; // 회원 비밀번호
+    private String u_name; // 회원 이름
+    private String u_phone; // 회원 전화번호
+    private String u_email; // 회원 이메일
+    private LocalDate u_date; // 회원 생년월일
+    private int state; // 회원 상태
 
     // 생성자
 
@@ -45,6 +48,7 @@ public class UserDto { // class start
     }
 
     // setter and getter
+    // 각 필드별로 값을 읽고(set)/변경(get)
     public int getUno() {
         return uno;
     }
@@ -82,6 +86,8 @@ public class UserDto { // class start
         this.u_email = u_email;
     }
 
+    //getU_date()에서 LocalDate → java.sql.Date로 변환해서 DB저장 시 호환성.
+    //setU_date(String u_date)는 String 입력받아 LocalDate로 파싱.
     public java.sql.Date getU_date() {
         return java.sql.Date.valueOf(this.u_date);  // LocalDate → sql.Date 변환
     }
