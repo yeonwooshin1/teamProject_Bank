@@ -37,7 +37,7 @@ public final class AppRouter {
         while (true) {
             // ========== 1) 로그인 ==========
             // wire 연결
-            login.wire(scan , ioLock);
+            // login.wire(scan , ioLock);
 
             // 로그인 view 결과값 반환
             // 양수 = 성공 / uno 저장용으로 반환값 쓸 예정

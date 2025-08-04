@@ -10,6 +10,7 @@ import java.time.Instant;
 
 public class OtpService {   // class start
 
+
     // 절대 변하지 않는 상수
     private static final Duration INPUT_UNTIL = Duration.ofMinutes(2); // 발급 후 입력시간 2분 제한
     private static final Duration VALID_UNTIL = Duration.ofMinutes(2); // 성공 후 유효시간 2분 신뢰

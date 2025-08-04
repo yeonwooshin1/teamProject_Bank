@@ -6,6 +6,7 @@ import bankService.model.dto.IdResponseDto;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.ServiceConfigurationError;
 
 
 // 유저와 직접적으로 소통하는 콘솔/화면 담당
@@ -19,18 +20,19 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-    private Scanner scan; private Object ioLock;
-
+//    private Scanner scan; private Object ioLock;
+    Scanner scan = new Scanner(System.in);
+    Object ioLock = new Object();
 
     // 싱글톤 가져오기
     UserController userController = UserController.getInstance();
     OtpController otpController = OtpController.getInstance();
 
-    // wire
-    public void wire(Scanner scan , Object ioLock){
-        this.scan = scan;
-        this.ioLock = ioLock;
-    }   // wire end
+//    // wire
+//    public void wire(Scanner scan , Object ioLock){
+//        this.scan = scan;
+//        this.ioLock = ioLock;
+//    }   // wire end
 
     public int index() {
         synchronized (ioLock) {
