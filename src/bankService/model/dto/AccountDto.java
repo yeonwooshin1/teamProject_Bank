@@ -9,13 +9,14 @@ public class AccountDto {
     private int amount;          // 거래 금액
     private String memo;         // 메모
     private String t_date;       // 거래 일자
-    private String account_pwd; // 비밀번호
+    private String account_pwd;  // 비밀번호
     private int uno;
 
-    public AccountDto() {
-    }
-asdasd
-    public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date , String account_pwd , int uno) {
+    // 기본 생성자
+    public AccountDto() {}
+
+    // 거래내역 조회용 생성자 (필요한 필드만)
+    public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date) {
         this.tno = tno;
         this.account_no = account_no;
         this.from_acno = from_acno;
@@ -24,9 +25,16 @@ asdasd
         this.amount = amount;
         this.memo = memo;
         this.t_date = t_date;
-        this.account_pwd = account_pwd;
-        this.uno =  uno;
     }
+
+    // 전체 필드 생성자 (필요하면)
+    public AccountDto(int tno, String account_no, int from_acno, int to_acno, String type, int amount, String memo, String t_date, String account_pwd, int uno) {
+        this(tno, account_no, from_acno, to_acno, type, amount, memo, t_date);
+        this.account_pwd = account_pwd;
+        this.uno = uno;
+    }
+
+    // getter, setter들 (생략 가능하면 Lombok 써도 됨)
 
     public int getTno() {
         return tno;

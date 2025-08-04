@@ -9,7 +9,7 @@ import bankService.model.dao.AccountddDao;
 public class AppStart {
     public static void main(String[] args) {
 
-  BankView.getInstance().index();
+        BankView.getInstance().index();
 
 //        AccountddDao dao = AccountddDao.getInstance();  // 싱글톤이라 가정
 //
@@ -25,16 +25,27 @@ public class AppStart {
 //            System.out.println("계좌 등록 실패");
 //        }
 
-//         // 계좌 해지 테스트
+//        // 계좌 해지 테스트
 //        AccountddController cn = AccountddController.getInstance();
-//        String test = "111-301-234655";
+//        int uno = 1;
+//        String test = "111-301-225766";
 //        String paw = "test1234";
-//        boolean result = cn.AccountDel(test,paw);
-//        if (result){
+//        boolean result = cn.AccountDel(uno , test, paw);
+//        if (result) {
 //            System.out.println("성공");
-//        }else {
+//        } else {
 //            System.out.println("실패");
+//
+//
+//        }
+//
+//        // 계좌 조회 테스트
+//        BankView view = BankView.getInstance();
+//        int testuno = 1;
+//
+//        System.out.println("거레 조회 테스트");
+//        view.AccountList(testuno);
 
 
-        }
     }
+}

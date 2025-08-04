@@ -47,10 +47,9 @@ public class AccountddDao {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, account_no);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
                 int count = rs.getInt(1);
-                return count == 0;  // 0이면 사용가능, 1 이상이면 중복됨
+                return count == 0;  // 0이면 가능, 1 이상이면 중복
             }
 
         } catch (Exception e) {
@@ -89,13 +88,15 @@ public class AccountddDao {
         }
     }
 
+
     // 계좌 해지
     public boolean AccountDel(AccountDto dto) { // 계좌번호 , 패스워드
         try {
-            String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ?";
+            String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ? AND uno = ? ";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, dto.getAccount_no());
             ps.setString(2, dto.getAccount_pwd());
+            ps.setInt(3, dto.getUno());
 
             int result = ps.executeUpdate();
             if (result == 1) {
@@ -110,8 +111,24 @@ public class AccountddDao {
         }
     }
 
-/*
-    // 계좌 조회 메소드
+    // 사용자 1 일경우
+    public ArrayList<String> AccountListUno(int uno) {
+        ArrayList<String> accountList = new ArrayList<>();
+        try {
+            String sql = "SELECT account_no FROM account WHERE uno = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, uno);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                accountList.add(rs.getString("account_no"));
+            }
+        } catch (Exception e) {
+            System.out.println("회원 계좌 목록 조회 실패: " + e);
+        }
+        return accountList;
+    }
+
     // 계좌 조회
     public ArrayList<AccountDto> AccountList(String account_no) {
         ArrayList<AccountDto> list = new ArrayList<>();
@@ -151,5 +168,4 @@ public class AccountddDao {
 
 
 
- */
 } // class e
