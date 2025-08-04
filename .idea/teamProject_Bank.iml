@@ -14,5 +14,7 @@
     <orderEntry type="library" name="javax.activation-1.2.0" level="project" />
     <orderEntry type="library" name="opencsv-2.3 (2)" level="project" />
     <orderEntry type="library" name="mysql-connector-j-9.3.0 (2)" level="project" />
+    <orderEntry type="library" name="opencsv-2.3 (2)" level="project" />
+    <orderEntry type="library" name="mysql-connector-j-9.3.0 (2)" level="project" />
   </component>
 </module>

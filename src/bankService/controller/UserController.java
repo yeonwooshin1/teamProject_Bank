@@ -3,6 +3,7 @@ package bankService.controller;
 import bankService.model.dao.UserDao;
 import bankService.model.dto.IdResponseDto;
 import bankService.model.dto.UserDto;
+import bankService.util.EmailValidationUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -89,8 +90,11 @@ public class UserController { // class start
     //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호 찾기1
-    public int verifyAccount(String u_id, String u_phone) {
-        return userDao.verifyAccount(u_id, u_phone);
+    public int verifyAccount(String u_id, String u_email) {
+        // 이메일 유효성 검사
+        boolean result = EmailValidationUtil.isSimpleEmailFormat(u_email);
+        if(!result) return -1;
+        return userDao.verifyAccount(u_id, u_email);
     }
 
     //----------------------------------------------------------------------------------------------------//

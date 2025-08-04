@@ -92,7 +92,7 @@ public class UserView { // class start
             return result;
         }
 
-        if (otpRequiredPrompt()) {
+        if (otpRequiredPromptLogin()) {
             boolean success = handleOtpProcess(result);
             return success ? result : 0;
         } else {
@@ -101,7 +101,7 @@ public class UserView { // class start
         }
     }   // func end
 
-    private boolean otpRequiredPrompt() {
+    private boolean otpRequiredPromptLogin() {
         while (true) {
             System.out.println("안전한 서비스 이용을 위해 최초 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
             System.out.print(" Y / N : ");
@@ -114,10 +114,17 @@ public class UserView { // class start
     }
 
     private boolean handleOtpProcess(int uno) {
+        String email = otpController.findEmail(uno);
+        boolean result = handleOtpProcess(email ,1);
+        return result;
+
+    }
+
+    public boolean handleOtpProcess(String email , int value){
         while (true) {
-            String email = otpController.findEmail(uno);
-            otpController.getIssue(email);
-            System.out.println("회원님의 이메일로 OTP 인증 메일을 발송했습니다.");
+            if (value == 1) otpController.getIssuePW(email);
+            else if (value == 2) otpController.getIssueLogin(email);
+            System.out.println("등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
 
             boolean verified = handleOtpInput();
             if (verified) return true;
@@ -134,7 +141,6 @@ public class UserView { // class start
 
 
     private boolean handleOtpInput() {
-        int attempts = 0;
 
         while (true) {
             System.out.print("OTP를 입력해주세요: ");
@@ -157,11 +163,6 @@ public class UserView { // class start
                 }
                 case 4 -> {
                     System.out.println("OTP가 일치하지 않습니다. 다시 시도해주세요.");
-                    if (++attempts >= 3) {
-                        System.out.println("입력을 너무 많이 실패했습니다.");
-                        return false;
-                    }
-                    // 재입력 허용
                 }
                 case 5 -> {
                     System.out.println("OTP 인증이 성공적으로 완료되었습니다.");
@@ -228,10 +229,15 @@ public class UserView { // class start
     public void findPassword() {
         System.out.print("아이디: ");
         String u_id = scan.next();
-        System.out.print("전화번호: ");
-        String u_phone = scan.next();
-        int check = userController.verifyAccount(u_id, u_phone);
+        System.out.print("이메일: ");
+        String u_email = scan.next();
+        int check = userController.verifyAccount(u_id, u_email);
+
+        if (check == -1) System.out.println("올바른 이메일 형식이 아닙니다. 다시 입력하세요.");
+
         if (check == 1) {
+            boolean otpResult = handleOtpProcess(u_email , 2);
+            if(!otpResult) return;
             System.out.print("새 비밀번호: ");
             String newPwd = scan.next();
             int result = userController.updatePassword(u_id, newPwd);

@@ -12,7 +12,7 @@ public class UserDao { // class start
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            System.out.println("JDBC 드라이버 로드 실패: " + e.getMessage());
+            System.out.println("JDBC 3드라이버 로드 실패: " + e.getMessage());
         }
     }
 
@@ -129,14 +129,14 @@ public class UserDao { // class start
 //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호찾기1
-    public int verifyAccount(String u_id, String u_phone) {
-        String sql = "SELECT COUNT(*) FROM user WHERE u_id = ? AND u_phone = ?";
+    public int verifyAccount(String u_id, String u_email) {
+        String sql = "SELECT COUNT(*) FROM user WHERE u_id = ? AND u_email = ?";
         try (
                 Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setString(1, u_id);
-            ps.setString(2, u_phone);
+            ps.setString(2, u_email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
                     return 1; // 사용자 정보 확인됨

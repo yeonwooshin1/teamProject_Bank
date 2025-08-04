@@ -129,10 +129,6 @@ public class OtpService {   // class start
         return !Instant.now().isAfter(session.getTrustUntil());
     }   // func end
 
-    // 재인증을 원하면 새로 발급하는 메소드
-    public String reissue() {
-        return issue();
-    }   // func end
 
 
     // 입력한 otp 값이랑 지정된 otp 값이 일치하는지 확인하는 *헬퍼* 메소드

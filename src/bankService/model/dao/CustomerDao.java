@@ -11,7 +11,7 @@ public class CustomerDao { // class start
             // mysql 를 지정한 Driver 클래스 가져오기
             Class.forName("com.mysql.cj.jdbc.Driver");
         }
-        catch ( ClassNotFoundException e ) { System.out.println("[실패] mysql 드라이버 연동 실패"); } // 클래스 있는지 잘 연결됐는지 예외
+        catch ( ClassNotFoundException e ) { System.out.println("[실패] 1mysql 드라이버 연동 실패"); } // 클래스 있는지 잘 연결됐는지 예외
     }   // func end
 
     // DB 연결 정보

@@ -88,10 +88,17 @@ public class EmailService { // class start
 
     }   // func end
 
-    // HTML만 전송 (OTP 편의 메서드)
-    public void sendOtpHtml(String to, String otp) throws MessagingException {
-        String subject = EmailSendFormat.subject();
-        String html    = EmailSendFormat.bodyHtml(otp);
+    // HTML만 전송 비밀번호 변경 (OTP 편의 메서드)
+    public void sendOtpHtmlPW(String to, String otp) throws MessagingException {
+        String subject = EmailSendFormat.subjectPassWord();
+        String html    = EmailSendFormat.bodyHtmlPassWord(otp);
+        sendHtml(to, subject, html);
+    }   // func end
+
+    // HTML만 전송 로그인시도 (OTP 편의 메서드)
+    public void sendOtpHtmlLogin(String to, String otp) throws MessagingException {
+        String subject = EmailSendFormat.subjectLogin();
+        String html    = EmailSendFormat.bodyHtmlLogin(otp);
         sendHtml(to, subject, html);
     }   // func end
 }   // class end
