@@ -47,7 +47,7 @@ public class OtpController {    // class start
         // email 전송한다.
         // 이메일 전송중 오류 예외처리
         try {
-            emailService.sendOtpHtmlPW(email , otp);
+            emailService.sendOtpHtmlLogin(email , otp);
         } catch (MessagingException e) {
             System.out.println("이메일 전송 중 문제가 발생했습니다. 잠시 후 다시 시도하세요.");
         } // catch end
