@@ -24,12 +24,13 @@ public class UserController { // class start
     private UserDao userDao = UserDao.getInstance();
 
 
-    private static final int MAX_FAILS = 5;
     Map<String, Integer> loginFailMap = new HashMap<>();
 
     // 로그인
     public int login(String u_id, String u_pwd) {
 
+        //loginFailMap에서 해당 ID의 실패 횟수를 가져옴
+        //만약 기록이 없다면 0 반환
         if (loginFailMap.getOrDefault(u_id, 0) >= 5) {
             return -1; // 로그인 차단
         }
@@ -38,13 +39,14 @@ public class UserController { // class start
 
         int result = userDao.login( dto );
 
-        if (result > 0) {
+        if ( result > 0 ) { // 0이면 실패니까
             loginFailMap.put(u_id, 0);     // 실패횟수 초기화
-            return result;                 // ← dto.getUno() 대신 result 반환!
-        } else {
+            return result;                 // dto.getUno() 대신 result 반환!
+        } else{
             int failCount = loginFailMap.getOrDefault(u_id, 0) + 1;
             loginFailMap.put(u_id, failCount);
-            return failCount;              // 실패 횟수 반환
+            System.out.println( "실패횟수 : " + failCount );
+            return 0;              // 실패 횟수 반환
         }
     }
 
@@ -76,31 +78,43 @@ public class UserController { // class start
     // 싱글톤 DAO 가져오기
     private final UserDao dao = UserDao.getInstance();
 
+
+    //----------------------------------------------------------------------------------------------------//
+
     // Controller는 DAO만 호출
     public IdResponseDto findId(String u_name, String u_phone) {
         return dao.findId(u_name, u_phone);
     }
 
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호 찾기1
     public int verifyAccount(String u_id, String u_phone) {
         return userDao.verifyAccount(u_id, u_phone);
     }
 
+    //----------------------------------------------------------------------------------------------------//
+
     // 비밀번호 찾기2
     public int updatePassword(String u_id, String newPwd) {
         return userDao.updatePassword(u_id, newPwd);
     }
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호 변경1
     public boolean verifyPassword(String u_id, String u_pwd) {
         return userDao.verifyPassword(u_id, u_pwd);
     }
 
+    //----------------------------------------------------------------------------------------------------//
+
     // 비밀번호 변경2
     public boolean update2Password(String u_id, String new_pwd) {
         return userDao.update2Password(u_id, new_pwd);
     }
+
+    //----------------------------------------------------------------------------------------------------//
 
 
     // 계정 탈퇴

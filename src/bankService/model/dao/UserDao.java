@@ -7,6 +7,15 @@ import java.sql.*;
 
 public class UserDao { // class start
 
+    // 드라이버 로드 (최초 1회만 실행됨)
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("JDBC 드라이버 로드 실패: " + e.getMessage());
+        }
+    }
+
     // 싱글톤
     private UserDao(){}
     private static final UserDao instance = new UserDao();
@@ -24,6 +33,8 @@ public class UserDao { // class start
     // 로그인
     public int login( UserDto dto ) {
 
+
+
         String sql = "SELECT uno FROM user WHERE u_id = ? AND u_pwd = ?";
 
         try {
@@ -39,11 +50,12 @@ public class UserDao { // class start
                 return uno;
             }
 
-        } catch (SQLException e) {
+        } catch ( Exception e) {
             System.out.println("SQLException 오류 발생 " + e.getMessage());
         }
 
         return 0; // 로그인 실패
+
     }
 
     //----------------------------------------------------------------------------------------------------//
@@ -77,13 +89,13 @@ public class UserDao { // class start
             ins.setString(4, dto.getU_phone());
             ins.setString(5, dto.getU_email());
             // java.time.LocalDate → java.sql.Date 로 변환
-            ins.setDate(6, dto.getU_date());
+            ins.setDate(6, Date.valueOf(dto.getU_date()));
 
 
             // 영향 받은 row 수(1 이면 성공) 리턴
             return ins.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return -3;  // DB 오류
         }
@@ -114,6 +126,7 @@ public class UserDao { // class start
         return null; // 못 찾으면 null 반환
     }
 
+//----------------------------------------------------------------------------------------------------//
 
     // 비밀번호찾기1
     public int verifyAccount(String u_id, String u_phone) {
@@ -135,6 +148,7 @@ public class UserDao { // class start
         return 0; // 계정 없음
     }
 
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호찾기2
     public int updatePassword(String u_id, String newPwd) {
@@ -152,6 +166,8 @@ public class UserDao { // class start
             return 0; // DB오류도 실패로 처리
         }
     }
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호 변경1
     public boolean verifyPassword(String u_id, String u_pwd) {
@@ -171,6 +187,8 @@ public class UserDao { // class start
         }
     }
 
+    //----------------------------------------------------------------------------------------------------//
+
     // 비밀번호 변경2
     public boolean update2Password(String u_id, String new_pwd) {
         String sql = "UPDATE user SET u_pwd = ? WHERE u_id = ?";
@@ -187,6 +205,8 @@ public class UserDao { // class start
             return false; // 예외도 실패 처리
         }
     }
+
+    //----------------------------------------------------------------------------------------------------//
 
 
     // 계정 탈퇴
