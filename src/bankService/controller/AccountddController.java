@@ -20,7 +20,6 @@ public class AccountddController {
 
     // 계좌 등록
     public boolean AccountAdd(String account_pwd){
-        int uno = 1;
         AccountDto dto = new AccountDto();
         dto.setAccount_pwd(account_pwd);
         dto.setUno(uno);

@@ -149,9 +149,7 @@ public class AccountddDao {
         return list;
     }
 
-    public boolean AccountAdd(AccountDto accountDto) {
-        return false;
-    }
+
 
  */
 } // class e

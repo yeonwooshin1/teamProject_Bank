@@ -13,7 +13,6 @@ public class BankView {
     public static BankView getInstance() {
         return instance;
     }
-    int uno = 1;
 
 
     private AccountddController ac = AccountddController.getInstance();
