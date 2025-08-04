@@ -27,29 +27,35 @@ public class MainView { // class start
         System.out.println("==========================================");
 
         if (choose == 1) {
-            changePassword();
+            changePassword(); // 1번 선택하면 비밀번호 변경
         } else if (choose == 2) {
-            deleteAccount();
+            deleteAccount(); // 2번 선택하면 계탈
         } else if (choose == 3) {
-            return;
+            return; // 전으로 돌아가기
         }
-    }
+    } // func end
 
 
     // 5. 비밀번호 변경
     public void changePassword() {
-        System.out.print("아이디: ");   String u_id = scan.next();
-        System.out.print("현재 비밀번호: "); String u_pwd = scan.next();
+        System.out.print("아이디: ");
+        String u_id = scan.next();
+        System.out.print("현재 비밀번호: ");
+        String u_pwd = scan.next();
         boolean check = userController.verifyPassword(u_id, u_pwd);
         if (check) {
             System.out.print("새 비밀번호: "); String newPwd = scan.next();
             boolean result = userController.update2Password(u_id, newPwd);
-            if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-            else        System.out.println("비밀번호 변경에 실패했습니다.");
+
+            // if 안에 if 성공했다면
+            if (result)
+                System.out.println("비밀번호가 성공적으로 변경되었습니다.");
+            else
+                System.out.println("비밀번호 변경에 실패했습니다.");
         } else {
             System.out.println("비밀번호가 일치하지 않습니다.");
-        }
-    }
+        } // if end
+    } // func end
 
 
     //----------------------------------------------------------------------------------------------------//
@@ -57,12 +63,17 @@ public class MainView { // class start
     // 6. 회원 탈퇴
     public void deleteAccount() {
         // 로그인된 사용자의 id가 있다고 가정, 여기는 직접 입력 받음
-        System.out.print("아이디: ");   String u_id = scan.next();
-        System.out.print("비밀번호: "); String u_pwd = scan.next();
+        System.out.print("아이디: ");
+        String u_id = scan.next();
+        System.out.print("비밀번호: ");
+        String u_pwd = scan.next();
         boolean result = userController.deleteAccount(u_id, u_pwd);
-        if (result) System.out.println("탈퇴 성공했습니다.");
-        else        System.out.println("탈퇴 실패했습니다.");
-    }
+        // 성공했다면
+        if (result)
+            System.out.println("탈퇴 성공했습니다.");
+        else
+            System.out.println("탈퇴 실패했습니다.");
+    } // func end
 
 
     //----------------------------------------------------------------------------------------------------//
