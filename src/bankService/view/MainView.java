@@ -76,7 +76,7 @@ public class MainView {
         System.out.println("==========================================");
 
         if(choose ==1 ){transfer();}
-        else if (choose ==2) { mainIndex(); }
+        else if (choose ==2) { transation(); }
 
     }
 
