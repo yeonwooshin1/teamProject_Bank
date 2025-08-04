@@ -8,6 +8,14 @@ public class MainView { // class start
 
     Scanner scan = new Scanner( System.in );
 
+    // 확인 싱글톤
+    // 싱글톤
+    private MainView(){}
+    private static final MainView instance = new MainView();
+    public static MainView getInstance(){
+        return instance;
+    }
+
     // 싱글톤 가져오기
     UserController userController = UserController.getInstance();
 
