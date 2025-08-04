@@ -34,8 +34,27 @@ public class UserView { // class start
             System.out.println("[4] 비밀번호 찾기");
             System.out.println("[0] 종료");
             System.out.print("선택 ➜ ");
-            int choose = scan.nextInt();
-            System.out.println("==========================================");
+
+
+            // 일단 choose
+            int choose;
+
+            // hasNextInt : 입력한 값이 숫자가 맞는지 확인해줌
+            if (scan.hasNextInt()) {
+                choose = scan.nextInt();
+                System.out.println("==========================================");
+                // 맞으면
+                // 범위 검사 (0~4)
+                if (choose < 0 || choose > 4) {
+                    System.out.println("※ 0~4번 중에서 선택하세요.\n");
+                    continue; // 다시 반복
+                }
+                // 숫자조차 아닐 경우
+            } else {
+                System.out.println("※ 숫자를 입력하세요.\n");
+                scan.nextLine(); // 잘못된 입력(문자열 등) 버림
+                continue; // 다시 반복
+            }
 
 
             if (choose == 1) { // 1번 선택하면 로그인
@@ -64,12 +83,13 @@ public class UserView { // class start
         int result = userController.login(u_id, u_pwd);
 
         // 괄호 안써도 출력됨
-        if (result == -1)
+        if (result == -1) {
             System.out.println("로그인 5회 시도했습니다.");
-        else if (result == 0)
+        }else if (result == 0) {
             System.out.println("로그인 실패했습니다.");
-        else
+        }else{
             System.out.println("로그인 성공했습니다.");
+        }
     } // func end
 
 
