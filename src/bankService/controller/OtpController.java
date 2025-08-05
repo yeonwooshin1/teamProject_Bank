@@ -17,10 +17,18 @@ public class OtpController {    // class start
 
     // 싱글톤 가져오기
     OtpDao otpDao = OtpDao.getInstance();
-    OtpService otpService = new OtpService();
-
-    //!!!!!!!!!!!!!!!!!!!!!! 나중에 한 인스턴스로 합쳐야함 approuter에서 wire로 묶어야함
     EmailService emailService = new EmailService();
+
+    // wire 멤버변수
+    OtpService otpService;
+    int uno;
+    // wire
+    public void wire (int uno, OtpService otp){
+        this.uno = uno;
+        this.otpService = otp;
+    }
+
+
 
 
     // 이메일 가져오기

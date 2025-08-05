@@ -20,19 +20,18 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-//    private Scanner scan; private Object ioLock;
-    Scanner scan = new Scanner(System.in);
-    Object ioLock = new Object();
+    private Scanner scan; private Object ioLock;
+
 
     // 싱글톤 가져오기
     UserController userController = UserController.getInstance();
     OtpController otpController = OtpController.getInstance();
 
-//    // wire
-//    public void wire(Scanner scan , Object ioLock){
-//        this.scan = scan;
-//        this.ioLock = ioLock;
-//    }   // wire end
+   // wire
+   public void wire(Scanner scan , Object ioLock){
+       this.scan = scan;
+       this.ioLock = ioLock;
+   }   // wire end
 
     public int index() {
         synchronized (ioLock) {
@@ -125,8 +124,8 @@ public class UserView { // class start
     // otp 발급 (로그인 1, 비밀번호찾기 2)
     public boolean handleOtpProcess(String email , int value){
         while (true) {
-            if (value == 1) otpController.getIssuePW(email);
-            else if (value == 2) otpController.getIssueLogin(email);
+            if (value == 1) otpController.getIssueLogin(email);
+            else if (value == 2) otpController.getIssuePW(email);
             System.out.println("등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
 
             boolean verified = handleOtpInput();

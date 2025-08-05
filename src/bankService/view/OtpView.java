@@ -16,6 +16,7 @@ public class OtpView {
     private OtpView(){}
     private static final OtpView INST = new OtpView();
     public static OtpView getInstance(){ return INST; }
+
     // 싱글톤 가져오기
     OtpController otpController = OtpController.getInstance();
 
@@ -26,7 +27,7 @@ public class OtpView {
 
 
     /* package-private */
-    void wire(OtpService otpService, Scanner scanner, ConsoleStatus status, Object ioLock) {
+    public void wire(OtpService otpService, Scanner scanner, ConsoleStatus status, Object ioLock) {
         this.otpService = otpService;
         this.scanner    = scanner;
         this.status     = status;

@@ -1,9 +1,8 @@
 package bankService.controller;
 
-import bankService.app.ConsoleSession;
 import bankService.model.dao.AccountDao;
 import bankService.model.dto.*;
-import bankService.app.ConsoleSessionManager;
+import bankService.service.OtpService;
 
 import java.util.ArrayList;
 
@@ -19,6 +18,16 @@ public class AccountController {
 
     // AccountDao 싱글톤 가져오기
     private final AccountDao accountDao = AccountDao.getInstance();
+
+    // wire 멤버변수
+    int uno;
+    OtpService otpService;
+
+    // wire
+    public void wire (int uno ,OtpService otp){
+        this.uno = uno;
+        this.otpService = otp;
+    }
 
 
     // ============================ 이겨레 입금 , 출금 , 이체 ================================ //
@@ -147,16 +156,14 @@ public class AccountController {
 
     // 계좌 등록
     public boolean accountAdd(String account_pwd){
-        ConsoleSession session = ConsoleSessionManager.getSession();
-        if (session == null) {
+        int uno = this.uno;
+        if (uno < 1) {
             System.out.println("세션이 없어서 계좌 해지 불가");
             return false;
         }
-        int uno = session.userNo();
         AccountDto dto = new AccountDto();
         dto.setAccount_pwd(account_pwd);
         dto.setUno(uno);
-
 
         return accountDao.accountAdd(dto);
     }

@@ -1,6 +1,8 @@
 package bankService.view;
 
+import bankService.app.ConsoleSession;
 import bankService.controller.AccountController;
+import bankService.controller.UserController;
 import bankService.model.dto.*;
 
 import java.util.ArrayList;
@@ -17,32 +19,30 @@ public class MainView {
 
     // 싱글톤 가져오기
     public AccountController accountController = AccountController.getInstance();
-
+    public UserController userController = UserController.getInstance();
     // Scanner 생성
     Scanner scan = new Scanner(System.in);
 
     // 로그인 후 은행 메인 view
-    public void mainIndex(){
-        for( ; ; ){
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("[1] 계좌관리");
-            System.out.println("[2] 입·출금");
-            System.out.println("[3] 계좌이체");
-            System.out.println("[4] 보안설정");
-            System.out.println("[0] 로그아웃");
-            System.out.print("선택 ➜ ");
-            int choose = scan.nextInt();
-            System.out.println("==========================================");
+    public void mainIndex(ConsoleSession ctx){
 
-            if(choose == 1){ account(); }
-            else if (choose == 2){ transation(); }
-            else if (choose == 3){ transferView(); }
-            else if (choose == 4){ }
-            else if (choose == 0){ }
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("[1] 계좌관리");
+        System.out.println("[2] 입·출금");
+        System.out.println("[3] 계좌이체");
+        System.out.println("[4] 보안설정");
+        System.out.println("[0] 로그아웃");
+        System.out.print("선택 ➜ ");
+        int choose = scan.nextInt();
+        System.out.println("==========================================");
 
-        } // for e
+        if(choose == 1){ account(); }
+        else if (choose == 2){ transation(); }
+        else if (choose == 3){ transferView(); }
+        else if (choose == 4){ }
+        else if (choose == 0){ }
     } // func e
 
     // =============================== 계좌 관리 ======================================== //
@@ -63,7 +63,7 @@ public class MainView {
         if(choose ==1 ){ accountAdd(); }
         else if (choose == 2 ){ accountDel(); }
         else if (choose == 3){ accountList(); }
-        else if (choose == 4){ mainIndex(); }
+        else if (choose == 4){ }//mainIndex(); }
     } // func e
 
     // 계좌 등록 view
@@ -152,7 +152,7 @@ public class MainView {
 
         if(choose == 1){ deposit(); }
         else if (choose == 2) {withdraw();}
-        else if (choose == 3) {mainIndex();}
+        else if (choose == 3) {}//mainIndex();}
     }
 
     // 계좌 이체 view
@@ -257,5 +257,31 @@ public class MainView {
             }
         }
     } // func e
+
+
+    // 5. 비밀번호 변경
+    public void changePassword() {
+        System.out.print("아이디: ");   String u_id = scan.next();
+        System.out.print("현재 비밀번호: "); String u_pwd = scan.next();
+        boolean check = userController.verifyPassword(u_id, u_pwd);
+        if (check) {
+            System.out.print("새 비밀번호: "); String newPwd = scan.next();
+            boolean result = userController.update2Password(u_id, newPwd);
+            if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
+            else        System.out.println("비밀번호 변경에 실패했습니다.");
+        } else {
+            System.out.println("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 6. 회원 탈퇴
+    public void deleteAccount() {
+        // 로그인된 사용자의 id가 있다고 가정, 여기는 직접 입력 받음
+        System.out.print("아이디: ");   String u_id = scan.next();
+        System.out.print("비밀번호: "); String u_pwd = scan.next();
+        boolean result = userController.deleteAccount(u_id, u_pwd);
+        if (result) System.out.println("탈퇴 성공했습니다.");
+        else        System.out.println("탈퇴 실패했습니다.");
+    }
 
 } // class e

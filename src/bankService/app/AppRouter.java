@@ -1,28 +1,29 @@
 package bankService.app;  // package
 
+import bankService.controller.AccountController;
+import bankService.controller.OtpController;
 import bankService.service.OtpService;
 import bankService.util.ConsoleStatus;
 
+import bankService.view.MainView;
 import bankService.view.OtpView;
 import bankService.view.UserView;
 
 import java.util.Scanner;
 
-/**
- * AppRouter (Composition Root)
- * - 로그인 화면 호출 → userNo(양수) 받으면 세션 시작
- * - 같은 OtpService 인스턴스를 세션 전역으로 주입
- * - MainView beginSession에서 상태바/가디언 스레드 시작, endSession에서 정리
- * - 메뉴는 '한 번의 상호작용'만 처리(B 패턴): 결과코드로 흐름 제어
- */
-
-
-public final class AppRouter {
+// view 들을 관리
+public final class AppRouter {  // class start
 
     // 싱글톤 만들기
-    private AppRouter() {}
+    private AppRouter() {
+    }
+
     private static final AppRouter INST = new AppRouter();
-    public static AppRouter getInstance() { return INST; }
+
+    public static AppRouter getInstance() {
+        return INST;
+    }
+
     //
     public void start() {
 
@@ -33,13 +34,13 @@ public final class AppRouter {
 
         // 싱글톤 가져오기
         final UserView login = UserView.getInstance();
-        // final MainView main  = MainView.getInstance();
+        final MainView main = MainView.getInstance();
 
         // 앱 실행
         while (true) {
             // ========== 1) 로그인 ==========
             // wire 연결
-            // login.wire(scan , ioLock);
+            login.wire(scan, ioLock);
 
             // 로그인 view 결과값 반환
             // 양수 = 성공 / uno 저장용으로 반환값 쓸 예정
@@ -73,32 +74,20 @@ public final class AppRouter {
             ConsoleSession ctx = new ConsoleSession(uno, scan, ioLock, status, otp);
 
             // 재인증 뷰 연결(같은 otp/scan/status/ioLock)
-            // OtpView.getInstance().wire(ctx.otp(), ctx.scan(), ctx.status(), ctx.ioLock());
+            OtpView.getInstance().wire(ctx.otp(), ctx.scan(), ctx.status(), ctx.ioLock());
             // 컨트롤러(출금/입금)에도 같은 otp 주입(DAO는 필요 시 추가)
-            // BankController.getInstance().wire(/* dao */ null, ctx.otp);
+            AccountController.getInstance().wire(ctx.userNo() ,ctx.otp());
+            OtpController.getInstance().wire(ctx.userNo() , ctx.otp());
 
-//            // 메인 세션 입장(스레드 시작)
-//            main.beginSession(ctx);
-//
-//            // ========== 3) 메인 세션 루프(B 패턴) ==========
-//            while (true) {
-//                int r = main.menuOnce(); // -1: 종료, 0: 로그아웃, 1: 계속
-//                if (r == MainView.EXIT_APP) {
-//                    main.endSession(); // 스레드 정리
-//                    synchronized (ioLock) {
-//                        status.pause();
-//                        System.out.println("안녕히 가세요.");
-//                        status.resume();
-//                    }
-//                    return; // 앱 완전 종료
-//                }
-//                if (r == MainView.LOGOUT) {
-//                    main.endSession(); // 스레드 정리
-//                    break;             // 바깥 루프로 복귀 → 로그인 화면
-//                }
-//                // CONTINUE(1) → 다음 메뉴 1건 계속 처리
-            }
+            // 메인 세션 입장(스레드 시작)
+            main.mainIndex(ctx);
+
+            // ========== 3) 메인 세션 루프(B 패턴) ==========
+            while (true) {
 
 
-        }
-    }
+            }   // while end
+
+        } // while end
+    }   // func end
+}   // class end
