@@ -101,6 +101,7 @@ public class UserView { // class start
         }
     }   // func end
 
+    // 로그인시 otp 발급 여부 묻기 메소드
     private boolean otpRequiredPromptLogin() {
         while (true) {
             System.out.println("안전한 서비스 이용을 위해 최초 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
@@ -113,6 +114,7 @@ public class UserView { // class start
         }
     }
 
+    // otp 발급을 받겠다할 시 실행시킬 것 로그인 전용
     private boolean handleOtpProcess(int uno) {
         String email = otpController.findEmail(uno);
         boolean result = handleOtpProcess(email ,1);
@@ -120,6 +122,7 @@ public class UserView { // class start
 
     }
 
+    // otp 발급 (로그인 1, 비밀번호찾기 2)
     public boolean handleOtpProcess(String email , int value){
         while (true) {
             if (value == 1) otpController.getIssuePW(email);
@@ -139,7 +142,7 @@ public class UserView { // class start
         }
     }
 
-
+    // otp 입력 뷰
     private boolean handleOtpInput() {
 
         while (true) {
@@ -253,7 +256,5 @@ public class UserView { // class start
 
 
     //----------------------------------------------------------------------------------------------------//
-
-
 
 } // class end
