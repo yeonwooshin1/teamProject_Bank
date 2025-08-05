@@ -2,6 +2,7 @@ package bankService.controller;
 
 import bankService.model.dao.AccountDao;
 import bankService.model.dto.*;
+import bankService.app.ConsoleSessionManager;
 
 import java.util.ArrayList;
 
@@ -145,16 +146,16 @@ public class AccountController {
 
     // 계좌 등록
     public boolean accountAdd(String account_pwd){
-        int uno = 1;
+        int uno = ConsoleSessionManager.getSession().userNo();
         AccountDto dto = new AccountDto();
         dto.setAccount_pwd(account_pwd);
         dto.setUno(uno);
         return accountDao.accountAdd(dto);
     }
+
     // 계좌 해지
-    public boolean accountDel(int uno, String account_no, String account_pwd) {
+    public boolean accountDel( String account_no, String account_pwd) {
         AccountDto dto = new AccountDto();
-        dto.setUno(uno);  // 이 부분 추가!
         dto.setAccount_no(account_no);
         dto.setAccount_pwd(account_pwd);
         return accountDao.accountDel(dto);

@@ -1,5 +1,7 @@
 package bankService;
 
+import bankService.app.ConsoleSession;
+import bankService.app.ConsoleSessionManager;
 import bankService.controller.AccountController;
 import bankService.model.dao.AccountDao;
 import bankService.model.dto.TransactionDto;
@@ -12,7 +14,7 @@ public class TestAppStart {
     public static void main(String[] args) {
 
         // MainView test
-         MainView.getInstance().mainIndex();
+         //MainView.getInstance().mainIndex();
 
 //        // db 연동 테스트
 //        AccountDao dao = AccountDao.getInstance();
@@ -51,16 +53,15 @@ public class TestAppStart {
 //        TransferDto transferDto = new TransferDto("111-228-586525" , "111-281-306773" , "563381" , 3000 , "테스트");
 //        TransferResultDto transferResultDto = accountController.transfer(transferDto);
 //        System.out.println("[이체 결과]" + transferResultDto.getMessage() + "잔액 : " + transferResultDto.getBalance());
-        //        // 계좌 등록 테스트
-//        AccountController controller = AccountController.getInstance();
-//        String testPwd = "test1234";
-//        boolean result = controller.accountAdd(testPwd);
-//
-//        if(result){
-//            System.out.println("계좌 등록 성공");
-//        }else {
-//            System.out.println("계좌 등록 실패");
-//        }
+
+
+
+//          //계좌 등록 테스트
+//            AccountController controller = AccountController.getInstance();
+//            String testPwd = "test1234";
+//            boolean result = controller.accountAdd(testPwd);
+//            if(result){ System.out.println("계좌 등록 성공");}
+//            else { System.out.println("계좌 등록 실패");}
 //
 //        // 계좌 해지 테스트
 //        int uno = 1;

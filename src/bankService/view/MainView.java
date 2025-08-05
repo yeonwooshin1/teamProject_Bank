@@ -6,6 +6,7 @@ import bankService.model.dto.TransactionResultDto;
 import bankService.model.dto.TransferDto;
 import bankService.model.dto.TransferResultDto;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainView {
@@ -74,6 +75,14 @@ public class MainView {
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 새 계좌 개설 >");
+        System.out.println("계좌 비밀번호 설정 : "); String account_pwd = scan.next();
+
+        boolean result = accountController.accountAdd(account_pwd);
+        if(result){
+            System.out.println("계좌가 개설되었습니다.");
+        }else {
+            System.out.println("계좌 개설 실패 ");
+        }
 
 
 
@@ -85,6 +94,16 @@ public class MainView {
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 계좌 해지 >");
+        System.out.println("해지할 계좌 번호");    String account_no = scan.next();
+        System.out.println("계좌 비밀 번호 :");   String account_pwd = scan.next();
+
+        boolean result = accountController.accountDel(account_no , account_pwd);
+        if(result){
+            System.out.println("해지 성공");
+        }
+        else {
+            System.out.println("해지 실패");
+        }
 
     }
 
@@ -94,13 +113,12 @@ public class MainView {
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 내 계좌 목록 >");
+        System.out.println("uno 입력하세요..?"); int uno = scan.nextInt();
+
+        ArrayList<String> result = accountController.accountListUno(uno);
+        System.out.println(result);
 
     }
-
-
-
-
-
 
     // ================================ 겨레 입금 , 출금 , 이체 ================================ //
 
