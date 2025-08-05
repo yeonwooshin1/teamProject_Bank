@@ -1,7 +1,6 @@
 package bankService.thread;
 
 import bankService.service.OtpService;
-import bankService.view.OtpView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -12,7 +11,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * - 신뢰가 끊어지면 reauthNeeded(true)로 "신호만" 올림
  * - 입력/뷰 호출 책임은 MainView가 가짐(책임 분리)
  */
-public class OtpGuardianThread extends Thread {
+
+public class OtpGuardianThread extends Thread { // class start
 
     private final OtpService otpService;
     private final AtomicBoolean reauthNeeded; // MainView가 읽는 플래그
@@ -28,7 +28,7 @@ public class OtpGuardianThread extends Thread {
         this.pollMillis = (pollMillis <= 0) ? 700 : pollMillis;
         setName("OtpGuardianThread");
         setDaemon(true); // 앱 종료 시 자동 종료
-    }
+    }   // 생성자 end
 
     @Override
     public void run() {
@@ -41,6 +41,6 @@ public class OtpGuardianThread extends Thread {
             }
         } catch (InterruptedException e) {
             interrupt(); // 정상 종료
-        }
-    }
-}
+        }   // catch end
+    }   // run end
+}   // class end

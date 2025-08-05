@@ -28,12 +28,13 @@ public class UserController { // class start
     // wire 멤버변수
     OtpService otpService;
     int uno;
-    // wire
+
+    // wire 세션 연결
     public void wire (int uno, OtpService otp){
         this.uno = uno;
         this.otpService = otp;
     }
-
+    // 실패시 count 해주는 map
     Map<String, Integer> loginFailMap = new HashMap<>();
 
     // 로그인

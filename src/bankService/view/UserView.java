@@ -4,6 +4,7 @@ import bankService.controller.OtpController;
 import bankService.controller.UserController;
 import bankService.model.dto.IdResponseDto;
 import bankService.service.OtpService;
+import org.jline.reader.LineReader;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -21,7 +22,7 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-    private Scanner scan; private Object ioLock; OtpService otpService;
+    private Scanner scan; private Object ioLock; OtpService otpService; LineReader reader;
 
 
     // 싱글톤 가져오기
@@ -29,10 +30,11 @@ public class UserView { // class start
     OtpController otpController = OtpController.getInstance();
 
    // wire
-   public void wire(Scanner scan , Object ioLock , OtpService otpService){
+   public void wire(Scanner scan, LineReader reader , Object ioLock , OtpService otpService){
        this.scan = scan;
        this.ioLock = ioLock;
        this.otpService = otpService;
+       this.reader = reader;
    }   // wire end
 
     public int index() {
@@ -254,8 +256,5 @@ public class UserView { // class start
             System.out.println("입력 정보에 맞는 계정을 찾을 수 없습니다.");
         } // if end
     } // func end
-
-
-    //----------------------------------------------------------------------------------------------------//
 
 } // class end

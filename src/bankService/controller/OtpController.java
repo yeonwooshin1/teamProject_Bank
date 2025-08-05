@@ -8,6 +8,7 @@ import javax.mail.MessagingException;
 
 
 public class OtpController {    // class start
+
     // 싱글톤 만들기
     private OtpController(){}
     private static OtpController otpController = new OtpController();
@@ -20,21 +21,20 @@ public class OtpController {    // class start
     EmailService emailService = new EmailService();
 
     // wire 멤버변수
-    OtpService otpService;
-    int uno;
+    private OtpService otpService;
+    private int uno;
 
-    // wire
+    // wire 세션 연결
     public void wireUno (int uno){
         this.uno = uno;
 
     }
-    // wire
+    // wire 세션 연결
     public void wireOtp (OtpService otp) {
         this.otpService = otp;
     }
 
-
-
+    // === method ===
 
     // 이메일 가져오기
     public String findEmail(int uno) {
@@ -77,17 +77,13 @@ public class OtpController {    // class start
         return result;
     }   // func end
 
-    /**
-     * 1) 신뢰 유효하면 true 리턴
-     * 2) 만료 시 사용자에게 묻고,
-     *    Y → OtpView.forceReauth() 실행 후 유효 여부 리턴
-     *    N → false 리턴
-     */
+    // mainView에 만료시 묻는 로직 controller
+    // 신뢰 유효하면 true 리턴 만료 시 사용자에게 묻고, Y → OtpView.forceReauth() 실행 후 유효 여부 리턴 N → false 리턴
     public boolean trustOtp() {
         // 1) 아직 유효하면 바로 통과
         if (otpService.checkValidUntil()) {
             return true;
-        }
+        }   // if end
         return false;
     }   // func end
 

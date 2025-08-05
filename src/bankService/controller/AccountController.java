@@ -20,10 +20,10 @@ public class AccountController {
     private final AccountDao accountDao = AccountDao.getInstance();
 
     // wire 멤버변수
-    int uno;
-    OtpService otpService;
+    private int uno;
+    private OtpService otpService;
 
-    // wire
+    // wire 세션 연결
     public void wire (int uno ,OtpService otp){
         this.uno = uno;
         this.otpService = otp;

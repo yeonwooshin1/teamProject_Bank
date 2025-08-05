@@ -7,123 +7,156 @@ import bankService.controller.UserController;
 import bankService.model.dto.*;
 import bankService.service.OtpService;
 import bankService.thread.OtpRemainingTimeViewThread;
-import bankService.util.ConsoleStatus;
+import org.jline.reader.LineReader;
+import org.jline.reader.UserInterruptException;
+import org.jline.reader.EndOfFileException;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
-public class MainView {
+// 메인 뷰
+public class MainView { // class start
 
     // 싱글톤 생성
     private MainView(){}
     private static final MainView instance = new MainView();
-    public static MainView getInstance(){
-        return instance;
-    }
+    public static MainView getInstance(){ return instance; }
 
     // 싱글톤 가져오기
     public AccountController accountController = AccountController.getInstance();
     public UserController userController = UserController.getInstance();
 
-
-
-    // ───────── 주입될 의존성 ─────────
-    private  ConsoleSession ctx;                // 한 번에 묶어서 보관
-    private Scanner scan;             // 콘솔 입력
-    private Object  ioLock;           // I/O 직렬화 락
-    private ConsoleStatus    status;           // 상태바 제어
+    // 의존성
+    private ConsoleSession ctx;
+    private Object ioLock;
     private final OtpController otpController = OtpController.getInstance();
+    private LineReader reader;
+
+    private OtpRemainingTimeViewThread otpTimerThread = null;
 
     /**
      * Router 에서 세션 정보 한 번에 주입.
      * 이후 모든 메서드는 매개변수 없이 내부 필드를 바로 사용.
      */
+    // 섹션 연결
     public void wire(ConsoleSession ctx) {
         this.ctx  = ctx;
-        this.scan = ctx.scan();
         this.ioLock = ctx.ioLock();
-        this.status = ctx.status();
+        this.reader = ctx.reader(); // LineReader로 변경
+    }   // wire end
+
+
+
+    public LineReader getReader() {
+        return reader;
+    }   // getter
+
+    // 1. 상태바 문자열(volatile: 멀티스레드 안전)
+    private volatile String statusBar = "";   // [상태바] 현재 남은 OTP 신뢰 시간 등 출력
+
+    /**
+     * [상태바 메세지 갱신용] OtpRemainingTimeViewThread 등에서 호출
+     * - 이 메서드는 단순히 문자열만 갱신한다! (println에서 직접 출력)
+     */
+    public void setStatusBar(String msg) {
+        this.statusBar = msg;   // 메뉴 출력 이후 하단에 출력 용도
     }
-    // otp 신뢰시간 초마다 알려주는 thread
-    private OtpRemainingTimeViewThread otpTimerThread = null;
+
+    /**
+     * [상태바 출력] 메뉴/화면 출력 끝나고 마지막 줄에 호출!
+     * - 이걸 각 메뉴/목록 출력 후 호출하면, printAbove 없이도 아래에 상태처럼 보임.
+     */
+    private void printStatusBarIfPresent() {
+        if (statusBar != null && !statusBar.isEmpty()) {
+            System.out.println(statusBar);
+        }
+    }
+
+    // ================== LineReader + 상태바 입력 유틸 ==================
+
+    private int readInt(String prompt) {
+        while (true) {
+            printStatusBarIfPresent(); // 입력 전 상태바 출력
+            synchronized (ioLock) {
+                try {
+                    String line = reader.readLine(prompt).trim();
+                    return Integer.parseInt(line);
+                } catch (NumberFormatException e) {
+                    System.out.println("숫자를 입력하세요.");
+                    // 계속 반복해서 다시 입력받음
+                } catch (UserInterruptException | EndOfFileException e) {
+                    System.out.println();
+                    return -1; // 입력 중단
+                }
+            }
+        }
+    }
+
+    private String readLine(String prompt) {
+        printStatusBarIfPresent(); // 입력 전 상태바 출력
+        synchronized (ioLock) {
+            return reader.readLine(prompt).trim();
+        }
+    }   // readLine end
+
+    /** [남은 인증시간 프롬프트 꾸미기 */
+    private String fullPromptWithTime(String prompt) {
+        long sec = ctx.otp().getRemainingTrustSeconds();
+        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안❌ 재인증]";
+        return prompt + msg + " ";
+    }
+
+    // ========== 이하 모든 readInt/readLine을 위 유틸로만 사용! ==========
+
+
 
     // 로그인 후 은행 메인 view
     public boolean mainIndex(){
-        // 1) 세션 시작 시 스레드 실행
+        // mainIndex() 시작부
         if (otpTimerThread == null || !otpTimerThread.isAlive()) {
-            otpTimerThread = new OtpRemainingTimeViewThread(ctx.otp(), status);
+            otpTimerThread = new OtpRemainingTimeViewThread(ctx.otp(), this);
             otpTimerThread.start();
         }
-        try {
-            while (true){
-                // 1) 보안 세션 확인/재인증
-                if (!ensureAuthenticated()) {
-                    return false;
-                }   // if end
 
-                // 2) 메뉴 출력
-                synchronized (ioLock) {
-                    status.pause(); // 상태줄 깨끗이
-                    System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-                    System.out.println("┃                 BB  BANK               ┃");
-                    System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-                    System.out.println("[1] 계좌관리  [2] 입·출금  [3] 계좌이체");
-                    System.out.println("[4] 보안설정  [0] 로그아웃");
-                    System.out.print("선택 ➜ ");
-                    status.resume();
-                }   // syn end
-                int choose = scan.nextInt();
-                System.out.println("==========================================");
+        while (true){
+            // 1) 보안 세션 확인/재인증
+            if (!ensureAuthenticated()) {
+                return false;
+            }   // if end
 
-                if(choose == 1){ boolean ok = account();
-                    if (!ok) return false; }
-                else if (choose == 2){  boolean ok = transation();
-                    if (!ok) return false; }
-                else if (choose == 3){ boolean ok = transferView();
-                    if (!ok) return false; }
-                else if (choose == 4){ boolean ok = securitySettingsView();
-                    if (!ok) return false; }// ← 회원탈퇴 성공 등으로 false면 바로 return false
-                else if (choose == 0){ return false;}
-                else {
-                    synchronized (ioLock) {
-                        status.pause();
-                        System.out.println("잘못된 입력입니다.");
-                        status.resume();
-                    }   // syn end
-                }   // else end
-            }   // while end
-        } finally {
-            // 2) 세션이 끝나면 스레드 정지
-            if (otpTimerThread != null && otpTimerThread.isAlive()) {
-                otpTimerThread.interrupt();
-                otpTimerThread = null;
-            }
-        }
-    } // func e
-
-    // =============================== 계좌 관리 ======================================== //
-
-    // 계좌 관리 view
-    public boolean account(){
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
-
-        synchronized (ioLock) {
-            status.pause();
+            // 2) 메뉴 출력
             System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
             System.out.println("┃                 BB  BANK               ┃");
             System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("[1] 새 계좌 개설");
-            System.out.println("[2] 계좌 해지");
-            System.out.println("[3] 내 계좌 목록");
-            System.out.println("[4] 뒤로");
-            System.out.print("선택 ➜ ");
-            status.resume();
-        }   // syn end
-        int choose = scan.nextInt();
+            System.out.println("[1] 계좌관리  [2] 입·출금  [3] 계좌이체");
+            System.out.println("[4] 보안설정  [0] 로그아웃");
+            int choose = readInt("선택 ➜");
+
+            System.out.println("==========================================");
+
+            if(choose == 1){ boolean ok = account(); if (!ok) return false; }
+            else if (choose == 2){  boolean ok = transation(); if (!ok) return false; }
+            else if (choose == 3){ boolean ok = transferView(); if (!ok) return false; }
+            else if (choose == 4){ boolean ok = securitySettingsView(); if (!ok) return false; }
+            else if (choose == 0){ return false;}
+            else {
+                System.out.println("잘못된 입력입니다.");
+            }   // if end
+        }   // while end
+    }   // func end
+
+    // =============================== 계좌 관리 ======================================== //
+
+    // 계좌 통합 view
+    public boolean account(){
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("[1] 새 계좌 개설");
+        System.out.println("[2] 계좌 해지");
+        System.out.println("[3] 내 계좌 목록");
+        System.out.println("[4] 뒤로");
+        int choose = readInt("선택 ➜");
         System.out.println("==========================================");
 
         if(choose ==1 ){ accountAdd(); }
@@ -131,560 +164,281 @@ public class MainView {
         else if (choose == 3){ accountList(); }
         else if (choose == 4){ return true; }
         else {
-            synchronized (ioLock) {
-                status.pause();
-                System.out.println("잘못된 입력입니다.");
-                status.resume();
-            }   // syn end
-        }   // else end
+            System.out.println("잘못된 입력입니다.");
+        }   // if end
         return true;
-    } // func end
+    }   // func end
 
-    // 계좌 등록 view
     public boolean accountAdd(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 새 계좌 개설 >");
+        String account_pwd = readLine("계좌 비밀번호 설정 :");
 
-        synchronized (ioLock){
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 새 계좌 개설 >");
-            System.out.print("계좌 비밀번호 설정 : ");
-            status.resume();
-        }   // syn end
-
-        String account_pwd = scan.next();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         boolean result = accountController.accountAdd(account_pwd);
 
-        synchronized (ioLock) {
-            status.pause();
-            if(result){
-                System.out.println("계좌가 개설되었습니다.");
-            }else {
-                System.out.println("계좌 개설 실패 ");
-            }   // if end
-            status.resume();
-        }   // syn end
-
+        if(result){
+            System.out.println("계좌가 개설되었습니다.");
+        }else {
+            System.out.println("계좌 개설 실패 ");
+        }  // if end
         return true;
     }   // func end
 
     // 계좌 해지 view
     public boolean accountDel(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 계좌 해지 >");
+        String account_no = readLine("해지할 계좌 번호:");
+        String account_pwd = readLine("계좌 비밀 번호 :");
 
-        synchronized (ioLock){
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 계좌 해지 >");
-            System.out.print("해지할 계좌 번호");
-            status.resume();
-        }   // syn end
-
-        String account_no = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("계좌 비밀 번호 :");
-            status.resume();
-        }   // syn end
-        String account_pwd = scan.next();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         boolean result = accountController.accountDel(account_no , account_pwd);
 
-        synchronized (ioLock) {
-            status.pause();
-            if(result){
-                System.out.println("해지 성공");
-            }
-            else {
-                System.out.println("해지 실패");
-            }   // if end
-            status.resume();
-        }   // syn end
-
+        if(result){
+            System.out.println("해지 성공");
+        }
+        else {
+            System.out.println("해지 실패");
+        }
         return true;
-    }   // func end
-
+    }
 
     // 계좌 목록 view
     public boolean accountList(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 내 계좌 목록 >");
+        String u_name = readLine("조회할 회원 이름을 입력하세요:");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 내 계좌 목록 >");
-            System.out.print("조회할 회원 이름을 입력하세요: ");
-            status.resume();
-        }   // syn end
-        scan.nextLine();
-        String u_name = scan.nextLine();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         ArrayList<AccountDto> list = accountController.accountList(u_name);
 
-        synchronized (ioLock) {
-            status.pause();
-            if (list.isEmpty()) {
-                System.out.println("해당 이름의 거래내역이 없습니다.");
-            } else {
-                for (AccountDto dto : list) {
-                    System.out.printf("[거래번호: %d] 계좌: %s | 출금: %d | 입금: %d | 유형: %s | 금액: %d | 메모: %s | 날짜: %s\n",
-                            dto.getTno(),
-                            dto.getAccount_no(),
-                            dto.getFrom_acno(),
-                            dto.getTo_acno(),
-                            dto.getType(),
-                            dto.getAmount(),
-                            dto.getMemo(),
-                            dto.getT_date()
-                    );
-                }   // for end
-            }   // if end
-            status.resume();
-        }   // syn end
+        if (list.isEmpty()) {
+            System.out.println("해당 이름의 거래내역이 없습니다.");
+        } else {
+            for (AccountDto dto : list) {
+                System.out.printf("[거래번호: %d] 계좌: %s | 출금: %d | 입금: %d | 유형: %s | 금액: %d | 메모: %s | 날짜: %s\n",
+                        dto.getTno(),
+                        dto.getAccount_no(),
+                        dto.getFrom_acno(),
+                        dto.getTo_acno(),
+                        dto.getType(),
+                        dto.getAmount(),
+                        dto.getMemo(),
+                        dto.getT_date()
+                );
+            }   // for end
+        }   // if end
         return true;
     }   // func end
 
-    // ================================ 겨레 입금 , 출금 , 이체 ================================ //
+    // ================================ 입·출금 , 이체 ================================ //
 
-    // 입·출금 view
+    // 입출금 view
     public boolean transation(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("[1] 입금");
-            System.out.println("[2] 출금");
-            System.out.println("[3] 뒤로");
-            System.out.print("선택 ➜ ");
-            status.resume();
-        }   // syn end
-        int choose = scan.nextInt();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("==========================================");
-            status.resume();
-        }   // syn end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("[1] 입금");
+        System.out.println("[2] 출금");
+        System.out.println("[3] 뒤로");
+        int choose = readInt("선택 ➜");
+        System.out.println("==========================================");
 
         if(choose == 1){ deposit(); }
-        else if (choose == 2) { withdraw();}
+        else if (choose == 2) { withdraw(); }
         else if (choose == 3) { return true; }
         return true;
     }   // func end
 
-    // 계좌 이체 view
+    // 이체 view
     public boolean transferView(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("[1] 이체");
+        System.out.println("[2] 뒤로");
+        int choose = readInt("선택 ➜");
+        System.out.println("==========================================");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("[1] 이체");
-            System.out.println("[2] 뒤로");
-            System.out.print("선택 ➜ ");
-            status.resume();
-        }   // syn end
-        int choose = scan.nextInt();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("==========================================");
-            status.resume();
-        }   // syn end
-
-        if(choose ==1 ){ transfer();}
+        if(choose ==1 ){ transfer(); }
         else if (choose ==2) { return true; }
         return true;
     }   // func end
 
     // 입금 view
     public boolean deposit(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 입금 >");
+        String account_no = readLine("입금할 계좌 :");
+        String account_pwd = readLine("계좌 비밀번호 :");
+        int amount = readInt("입금할 금액 :");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 입금 >");
-            System.out.println("입금할 계좌 : ");
-            status.resume();
-        }   // syn end
-        String account_no = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("계좌 비밀번호 : ");
-            status.resume();
-        }   // syn end
-        String account_pwd = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("입금할 금액 : ");
-            status.resume();
-        }
-        int amount = scan.nextInt();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         TransactionDto dto = new TransactionDto(account_no , account_pwd , amount);
         TransactionResultDto resultDto = accountController.deposit(dto);
 
-        synchronized (ioLock) {
-            status.pause();
-            if(resultDto.isSuccess()){
-                System.out.println("✅ 입금 성공!");
-                System.out.println("메시지 : " + resultDto.getMessage());
-                System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
-
-            }else {
-                System.out.println("❌ 입금 실패!");
-                System.out.println("에러 메시지 : " + resultDto.getMessage());
-            }   // if end
-            status.resume();
-        }   // syn end
+        if(resultDto.isSuccess()){
+            System.out.println("✅ 입금 성공!");
+            System.out.println("메시지 : " + resultDto.getMessage());
+            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+        }else {
+            System.out.println("❌ 입금 실패!");
+            System.out.println("에러 메시지 : " + resultDto.getMessage());
+        }   // if end
         return true;
-    } // func e
+    }   // func end
 
     // 출금 view
     public boolean withdraw(){
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 출금 >");
+        String account_no = readLine("출금할 계좌번호를 입력하세요. :");
+        String account_pwd = readLine("계좌 비밀번호 입력 :");
+        int amount = readInt("출금할 금액 :");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 출금 >");
-            System.out.print("출금할 계좌번호를 입력하세요. : ");
-            status.resume();
-        }   // syn end
-        String account_no = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("계좌 비밀번호 입력 : ");
-            status.resume();
-        }
-        String account_pwd = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("출금할 금액 : ");
-            status.resume();
-        }   // syn end
-        int amount = scan.nextInt();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
-        synchronized (ioLock) {
-            status.pause();
-            if(resultDto.isSuccess()){
-                System.out.println("✅ 입금 성공!");
-                System.out.println("메시지 : " + resultDto.getMessage());
-                System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
-            }else {
-                if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                    System.out.println("❌ 출금 실패!");
-                    System.out.println("잔액 부족");
-                    System.out.println("잔액 : " + resultDto.getBalance() + "원");
-                } else {
-                    System.out.println("❌ 출금 실패!");
-                    System.out.println("에러 메시지 : " + resultDto.getMessage());
-                }   // else2 end
-            }   // else1 end
-            status.resume();
-        }   // syn end
+        if(resultDto.isSuccess()){
+            System.out.println("✅ 입금 성공!");
+            System.out.println("메시지 : " + resultDto.getMessage());
+            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+        }else {
+            if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
+                System.out.println("❌ 출금 실패!");
+                System.out.println("잔액 부족");
+                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+            } else {
+                System.out.println("❌ 출금 실패!");
+                System.out.println("에러 메시지 : " + resultDto.getMessage());
+            }   // if end
+        }   // if end
         return true;
-    } // func e
+    }   // func end
 
-    // 계좌이체 view
+    // 이체 view
     public boolean transfer() {
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 이체 >");
+        String sender_no = readLine("이체할 계좌 :");
+        String receiver_no = readLine("이체받는 계좌 :");
+        String account_pwd = readLine("계좌 비밀번호 :");
+        int amount = readInt("이체할 금액 :");
+        String memo = readLine("이체 메모 :");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-            System.out.println("< 이체 >");
-            System.out.print("이체할 계좌 : ");
-            status.resume();
-        }
-        String sender_no = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("이체받는 계좌 : ");
-            status.resume();
-        }   // syn end
-        String receiver_no = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("계좌 비밀번호 : ");
-            status.resume();
-        }   // syn end
-        String account_pwd = scan.next();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("이체할 금액 : ");
-            status.resume();
-        }   // syn end
-        int amount = scan.nextInt();
-
-        synchronized (ioLock) {
-            status.pause();
-            System.out.println("이체 메모 : ");
-            status.resume();
-        }   // syn end
-        String memo = scan.next();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
         TransferResultDto resultDto = accountController.transfer(dto);
 
-        synchronized (ioLock) {
-            status.pause();
-            if (resultDto.isSuccess()) {
-                System.out.println("✅ 이체 성공!");
-
-            } else {
-                if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                    System.out.println("❌ 이체 실패!");
-                    System.out.println("잔액 부족");
-                    System.out.println("잔액 : " + resultDto.getBalance() + "원");
-                }   // if end
-            }   // else end
-            status.resume();
-        }   // syn end
+        if (resultDto.isSuccess()) {
+            System.out.println("✅ 이체 성공!");
+        } else {
+            if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
+                System.out.println("❌ 이체 실패!");
+                System.out.println("잔액 부족");
+                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+            }
+        }   // if end
         return true;
-    } // func e
+    }   // func end
 
-    // 보안설정 view
+
+    // ==================== 보안설정 view ====================
+
     public boolean securitySettingsView() {
         while (true) {
-            // 1) 보안 확인
-            if (!ensureAuthenticated()) {
-                return false;   // 재인증 거부 시 뒤로(혹은 로그아웃) 처리
-            }   // if end
+            if (!ensureAuthenticated()) return false;
+            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+            System.out.println("┃                 BB  BANK               ┃");
+            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+            System.out.println("< 보안 설정 >");
+            System.out.println("[1] 비밀번호 변경");
+            System.out.println("[2] 회원 탈퇴");
+            System.out.println("[3] 뒤로");
+            int choose = readInt("선택 ➜");
+            System.out.println("==========================================");
 
-            // 2) 메뉴 화면 출력
-            synchronized (ioLock) {
-                status.pause();
-                System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-                System.out.println("┃                 BB  BANK               ┃");
-                System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-                System.out.println("< 보안 설정 >");
-                System.out.println("[1] 비밀번호 변경");
-                System.out.println("[2] 회원 탈퇴");
-                System.out.println("[3] 뒤로");
-                System.out.print("선택 ➜ ");
-                status.resume();
-            }   // syn end
-
-            // 3) 사용자 선택 대기
-            int choose = scan.nextInt();
-            scan.nextLine(); // 입력 버퍼 클리어
-
-            // 4) 구분선 출력
-            synchronized (ioLock) {
-                status.pause();
-                System.out.println("==========================================");
-                status.resume();
-            }   // syn end
-
-            // 5) 분기 처리
             switch (choose) {
-                case 1:
-                    boolean result1 = changePassword();    // 비밀번호 변경 로직
-                    break;
-                case 2:
-                    boolean deleted = deleteAccount();
-                    if (!deleted) return false;
-                    break;
-                case 3:
-                    return true;
-                default:
-                    synchronized (ioLock) {
-                        status.pause();
-                        System.out.println("❌ 올바른 번호를 입력해주세요.");
-                        status.resume();
-                    }   // syn end
-                    break;
-                }
-               // switch end
+                case 1: changePassword(); break;
+                case 2: boolean deleted = deleteAccount(); if (!deleted) return false; break;
+                case 3: return true;
+                default: System.out.println("❌ 올바른 번호를 입력해주세요."); break;
+            }   // switch end
         }   // while end
     }   // func end
 
     // 5. 비밀번호 변경
     public boolean changePassword() {
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("아이디: ");
-            status.resume();
-        }   // syn end
-        String u_id = scan.next();
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("현재 비밀번호: ");
-            status.resume();
-        }   // syn end
-        String u_pwd = scan.next();
+        String u_id = readLine("아이디:");
+        String u_pwd = readLine("현재 비밀번호:");
 
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         boolean check = userController.verifyPassword(u_id, u_pwd);
 
         if (check) {
-            synchronized (ioLock){
-                status.pause();
-                System.out.print("새 비밀번호: ");
-                status.resume();
-            }   // syn end
-            String newPwd = scan.next();
+            String newPwd = readLine("새 비밀번호:");
 
-            // 보안 확인
-            if (!ensureAuthenticated()) {
-                return false;
-            }   // if end
+            if (!ensureAuthenticated()) return false;
 
             boolean result = userController.update2Password(u_id, newPwd);
-            synchronized (ioLock) {
-                status.pause();
-                if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-                else        System.out.println("비밀번호 변경에 실패했습니다.");
-                status.resume();
-            }   // syn end
+            if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
+            else        System.out.println("비밀번호 변경에 실패했습니다.");
         } else {
-            synchronized (ioLock) {
-                status.pause();
-                System.out.println("비밀번호가 일치하지 않습니다.");
-                status.resume();
-            }   // syn end
-        }   // else end
+            System.out.println("비밀번호가 일치하지 않습니다.");
+        }   // if end
         return true;
     }   // func end
 
     // 6. 회원 탈퇴
     public boolean deleteAccount() {
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
-        // 로그인된 사용자의 id가 있다고 가정, 여기는 직접 입력 받음
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("아이디: ");
-            status.resume();
-        }   // syn end
-        String u_id = scan.next();
+        String u_id = readLine("아이디:");
+        String u_pwd = readLine("비밀번호:");
 
-        synchronized (ioLock) {
-            status.pause();
-            System.out.print("비밀번호: ");
-            status.resume();
-        }   // syn end
-        String u_pwd = scan.next();
-
-        // 보안 확인
-        if (!ensureAuthenticated()) {
-            return false;
-        }   // if end
+        if (!ensureAuthenticated()) return false;
 
         boolean result = userController.deleteAccount(u_id, u_pwd);
 
-        synchronized (ioLock) {
-            status.pause();
-            if (result) {
-                System.out.println("탈퇴 성공했습니다.");
-                status.resume();
-                return false; // 바로 로그아웃(메인뷰 빠져나감)
-            }
-            else {
-                System.out.println("탈퇴 실패했습니다.");
-                status.resume();
-                return true; // 계속 남음
-            }
-        }   // syn end
-
+        if (result) {
+            System.out.println("탈퇴 성공했습니다.");
+            return false; // 바로 로그아웃(메인뷰 빠져나감)
+        }
+        else {
+            System.out.println("탈퇴 실패했습니다.");
+            return true; // 계속 남음
+        }   // if end
     }   // func end
-
 
     /**
      * 1) 신뢰 유효하면 true 리턴
@@ -697,39 +451,24 @@ public class MainView {
         if (otpController.trustOtp()) return true;
 
         while (true) {
-            // 화면 깨끗하게: 상태줄 숨기기
-            synchronized (ioLock) {
-                ctx.status().pause();
-                System.out.print("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? (Y/N): ");
-            }   // if end
-            String ans = scan.nextLine().trim().toLowerCase();
+            String ans = readLine("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? (Y/N):").toLowerCase();
 
             if (ans.equals("y")) {
-                // 사용자 동의 → OtpView로 재인증 화면 전환
                 OtpView.getInstance().forceReauth();
-                // 재인증 후 유효하면 true, 아니면 false
                 return otpController.trustOtp();
-            }   // if end
+            }
             else if (ans.equals("n")) {
-                synchronized (ioLock) {
-                    System.out.println("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? (Y/N): ");
-                }   // syn end
-                String ansRe = scan.nextLine().trim().toLowerCase();
+                String ansRe = readLine("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? (Y/N):").toLowerCase();
 
                 if (ansRe.equals("y")) {
-                    // 사용자 동의 → OtpView로 재인증 화면 전환
                     OtpView.getInstance().forceReauth();
-                    // 재인증 후 유효하면 true, 아니면 false
                     return otpController.trustOtp();
                 } else if (ansRe.equals("n")) {
-                    synchronized (ioLock){
-                        System.out.println("해당 계정에서 로그아웃 합니다.");
-                    }   // syn end
+                    System.out.println("해당 계정에서 로그아웃 합니다.");
                     return false;
                 }   // if end
             }   // if end
             else System.out.println("y , n 중 하나만 입력하세요.");
         }   // while end
     }   // func end
-
-} // class e
+}   // class end
