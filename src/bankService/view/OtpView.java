@@ -67,12 +67,14 @@ public class OtpView {  // class start
         }   // while end
     }   // func end
 
+    // 입력
     private void say(String msg) {
         synchronized (ioLock) {
             reader.printAbove(msg);
         }   // syn end
     }   // func end
 
+    // 출력
     private String ask(String prompt) {
         synchronized (ioLock) {
             return reader.readLine(prompt).trim();

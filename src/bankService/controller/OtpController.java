@@ -41,7 +41,7 @@ public class OtpController {    // class start
         return otpDao.findEmail(uno);
     }   // func end
 
-    // otp 발급
+    // otp 발급 비밀번호 찾기용 (이메일)
     public void getIssuePW (String email) {
         // otp 발급한다.
         String otp = otpService.issue();
@@ -54,6 +54,7 @@ public class OtpController {    // class start
         } // catch end
     }   // func end
 
+    // otp 발급 로그인용 (이메일)
     public void getIssueLogin (String email) {
         // otp 발급한다.
         String otp = otpService.issue();

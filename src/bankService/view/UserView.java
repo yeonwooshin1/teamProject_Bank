@@ -37,6 +37,8 @@ public class UserView { // class start
        this.reader = reader;
    }   // wire end
 
+
+    // 시작 로그인 view
     public int index() {
         synchronized (ioLock) {
             try {
@@ -101,7 +103,7 @@ public class UserView { // class start
         } else {
             System.out.println("로그인창으로 이동합니다.");
             return 0;
-        }
+        }   // if end
     }   // func end
 
     // 로그인시 otp 발급 여부 묻기 메소드
@@ -114,8 +116,8 @@ public class UserView { // class start
             if ("Y".equalsIgnoreCase(choose)) return true;
             else if ("N".equalsIgnoreCase(choose)) return false;
             else System.out.println("Y 또는 N 중에 선택해주세요.");
-        }
-    }
+        }   // while end
+    }   // func end
 
     // otp 발급을 받겠다할 시 실행시킬 것 로그인 전용
     private boolean handleOtpProcess(int uno) {
@@ -123,7 +125,7 @@ public class UserView { // class start
         boolean result = handleOtpProcess(email ,1);
         return result;
 
-    }
+    }   // func end
 
     // otp 발급 (로그인 1, 비밀번호찾기 2)
     public boolean handleOtpProcess(String email , int value){
@@ -141,9 +143,9 @@ public class UserView { // class start
             if (!"Y".equalsIgnoreCase(re)) {
                 System.out.println("로그인창으로 이동합니다.");
                 return false;
-            }
-        }
-    }
+            }   // if end
+        }   // while end
+    }   // func end
 
     // otp 입력 뷰
     private boolean handleOtpInput() {
@@ -177,10 +179,10 @@ public class UserView { // class start
                 default -> {
                     System.out.println("알 수 없는 오류입니다. 다시 시도해주세요.");
                     return false;
-                }
-            }
-        }
-    }
+                }   // default
+            }   // switch end
+        }   // while end
+    }   // func end
 
 
     //----------------------------------------------------------------------------------------------------//
