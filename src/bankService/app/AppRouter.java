@@ -97,6 +97,7 @@ public final class AppRouter {  // class start
                 while (true) {
                     // 메인 세션 입장(스레드 시작)
                     boolean mainResult = main.mainIndex();
+                    // 반환값 false면 로그인 창 true면 mainView 재실행
                     if (!mainResult) break;
                 }   // while end
             } // while end

@@ -109,7 +109,7 @@ public class MainView { // class start
 
 
 
-    // 로그인 후 은행 메인 view
+    // ================= 로그인 후 은행 메인 view ================================
     public boolean mainIndex(){
         // mainIndex() 시작부
         if (otpTimerThread == null || !otpTimerThread.isAlive()) {
