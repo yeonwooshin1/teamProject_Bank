@@ -117,15 +117,13 @@ public class MainView {
         ArrayList<AccountDto> list = accountController.accountList(u_name);
 
 
+
         if (list.isEmpty()) {
             System.out.println("해당 이름의 거래내역이 없습니다.");
         } else {
             for (AccountDto dto : list) {
-                System.out.printf("[거래번호: %d] 계좌: %s | 출금: %d | 입금: %d | 유형: %s | 금액: %d | 메모: %s | 날짜: %s\n",
-                        dto.getTno(),
-                        dto.getAccount_no(),
-                        dto.getFrom_acno(),
-                        dto.getTo_acno(),
+                System.out.println(dto.getAccount_no());
+                System.out.printf("거래유형:  %s \t  거래금액: %d \t 메모:  %s  날짜:  %s\n",
                         dto.getType(),
                         dto.getAmount(),
                         dto.getMemo(),
