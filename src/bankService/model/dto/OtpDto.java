@@ -3,7 +3,6 @@ package bankService.model.dto;
 import java.time.Instant;
 
 public class OtpDto {   // class start
-
     // 멤버변수
     private String otpHashHex;     // 해시값 문자열
     private Instant issuedAt;      // 발급 시각
@@ -22,6 +21,5 @@ public class OtpDto {   // class start
     public void setAttempts(int attemptsUsed) { this.attempts = attemptsUsed; }
     public Instant getTrustUntil() { return trustUntil; }
     public void setTrustUntil(Instant trustUntil) { this.trustUntil = trustUntil; }
-
 
 }   // class end

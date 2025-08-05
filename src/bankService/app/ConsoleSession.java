@@ -33,4 +33,3 @@ public class ConsoleSession {  // class start
     public OtpService otp() { return otp; }
 
 }   // class end
-

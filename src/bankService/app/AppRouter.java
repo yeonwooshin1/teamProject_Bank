@@ -15,6 +15,8 @@ import java.util.Scanner;
  * - MainView beginSession에서 상태바/가디언 스레드 시작, endSession에서 정리
  * - 메뉴는 '한 번의 상호작용'만 처리(B 패턴): 결과코드로 흐름 제어
  */
+
+
 public final class AppRouter {
 
     // 싱글톤 만들기
@@ -96,5 +98,7 @@ public final class AppRouter {
 //                }
 //                // CONTINUE(1) → 다음 메뉴 1건 계속 처리
             }
+
+
         }
     }
