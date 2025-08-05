@@ -1,7 +1,7 @@
 package bankService; // package
 
 import bankService.app.AppRouter;
-import bankService.view.UserView;
+
 
 public class AppStart { // class start
     public static void main(String[] args) {    // main start

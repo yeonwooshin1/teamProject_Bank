@@ -29,7 +29,7 @@ public final class AppRouter {  // class start
         return INST;
     }
 
-    // bb bank 서비스 원동력
+    // bb bank 서비스 원동력 start
     public void start() {
         try {
             // 앱 전역 콘솔 리소스(앱 수명 동안 1회 생성)
@@ -82,12 +82,12 @@ public final class AppRouter {  // class start
                 // context 값 할당
                 ConsoleSession ctx = new ConsoleSession(uno, scan ,reader, ioLock, otp);
 
-                // 유저넘버 , 락 객체 , 신뢰기간 , OTP서비스
+                // 유저넘버 , OTP 서비스 wire 연결
                 AccountController.getInstance().wire(ctx.userNo(), ctx.otp());
                 OtpController.getInstance().wireUno(ctx.userNo());
                 UserController.getInstance().wire(ctx.userNo(), ctx.otp());
 
-                // 재인증 뷰 연결(같은 otp/reader/status/ioLock)
+                // otp 재인증 뷰 연결(같은 otp/reader/scan/ioLock)
                 OtpView.getInstance().wire(ctx.otp(), ctx.scan() , ctx.ioLock() ,ctx.reader());
 
                 // wire 주입
@@ -97,12 +97,15 @@ public final class AppRouter {  // class start
                 while (true) {
                     // 메인 세션 입장(스레드 시작)
                     boolean mainResult = main.mainIndex();
+
                     // 반환값 false면 로그인 창 true면 mainView 재실행
                     if (!mainResult) break;
+
                 }   // while end
             } // while end
         } catch (IOException e) {
             System.out.println("JLine3 터미널 초기화 실패: " + e.getMessage());
         }   // catch end
+
     }   // func end
 }   // class end
