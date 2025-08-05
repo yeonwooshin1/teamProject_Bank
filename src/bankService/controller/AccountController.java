@@ -1,10 +1,9 @@
 package bankService.controller;
 
 import bankService.model.dao.AccountDao;
-import bankService.model.dto.TransactionDto;
-import bankService.model.dto.TransactionResultDto;
-import bankService.model.dto.TransferResultDto;
-import bankService.model.dto.TransferDto;
+import bankService.model.dto.*;
+
+import java.util.ArrayList;
 
 public class AccountController {
     // 입금 , 출금 , 이체
@@ -19,6 +18,8 @@ public class AccountController {
     // AccountDao 싱글톤 가져오기
     private final AccountDao accountDao = AccountDao.getInstance();
 
+
+    // ============================ 이겨레 입금 , 출금 , 이체 ================================ //
 
     // 입금 메소드
     public TransactionResultDto deposit(TransactionDto dto){
@@ -138,5 +139,43 @@ public class AccountController {
         return new TransferResultDto(true ,"이체가 완료되었습니다." , updateBalance);
 
     } // func e
+
+
+    // =========================== 지훈씨 계좌 관리 ================================== //
+
+    // 계좌 등록
+    public boolean accountAdd(String account_pwd){
+        int uno = 1;
+        AccountDto dto = new AccountDto();
+        dto.setAccount_pwd(account_pwd);
+        dto.setUno(uno);
+        return accountDao.accountAdd(dto);
+    }
+    // 계좌 해지
+    public boolean accountDel(int uno, String account_no, String account_pwd) {
+        AccountDto dto = new AccountDto();
+        dto.setUno(uno);  // 이 부분 추가!
+        dto.setAccount_no(account_no);
+        dto.setAccount_pwd(account_pwd);
+        return accountDao.accountDel(dto);
+    }
+
+
+    // 계좌번호 중복 검증
+    public boolean accountCheck(String account_no) {
+        return accountDao.accountCheck(account_no);
+    }
+
+    // 계좌 조회
+    // uno로 계좌번호 리스트 받기
+    public ArrayList<String> accountListUno(int uno) {
+        return accountDao.accountListUno(uno);
+    }
+
+    // 계좌번호로 거래내역 조회
+    public ArrayList<AccountDto> accountList(String account_no) {
+        return accountDao.accountList(account_no);
+    }
+
 
 } // class e

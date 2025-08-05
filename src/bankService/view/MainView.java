@@ -38,7 +38,7 @@ public class MainView {
             int choose = scan.nextInt();
             System.out.println("==========================================");
 
-            if(choose == 1){ }
+            if(choose == 1){ account(); }
             else if (choose == 2){ transation(); }
             else if (choose == 3){ transferView(); }
             else if (choose == 4){ }
@@ -46,6 +46,63 @@ public class MainView {
 
         } // for e
     } // func e
+
+    // =============================== 계좌 관리 ======================================== //
+
+    // 계좌 관리 view
+    public void account(){
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("[1] 새 계좌 개설");
+        System.out.println("[2] 계좌 해지");
+        System.out.println("[3] 내 계좌 목록");
+        System.out.println("[4] 뒤로");
+        System.out.print("선택 ➜ ");
+        int choose = scan.nextInt();
+        System.out.println("==========================================");
+
+        if(choose ==1 ){ accountAdd(); }
+        else if (choose == 2 ){ accountDel(); }
+        else if (choose == 3){ accountList(); }
+        else if (choose == 4){ mainIndex(); }
+    } // func e
+
+    // 계좌 등록 view
+    public void accountAdd(){
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 새 계좌 개설 >");
+
+
+
+    }
+
+    // 계좌 해지 view
+    public void accountDel(){
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 계좌 해지 >");
+
+    }
+
+    // 계좌 목록 view
+    public void accountList(){
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("< 내 계좌 목록 >");
+
+    }
+
+
+
+
+
+
+    // ================================ 겨레 입금 , 출금 , 이체 ================================ //
 
     // 입·출금 view
     public void transation(){
@@ -75,7 +132,7 @@ public class MainView {
         int choose = scan.nextInt();
         System.out.println("==========================================");
 
-        if(choose ==1 ){transfer();}
+        if(choose ==1 ){ transfer();}
         else if (choose ==2) { transation(); }
 
     }
@@ -164,10 +221,7 @@ public class MainView {
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + resultDto.getBalance() + "원");
             }
-
         }
-
-
     } // func e
 
 } // class e
