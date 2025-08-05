@@ -1,5 +1,6 @@
 package bankService.controller;
 
+import bankService.app.ConsoleSession;
 import bankService.model.dao.AccountDao;
 import bankService.model.dto.*;
 import bankService.app.ConsoleSessionManager;
@@ -146,19 +147,28 @@ public class AccountController {
 
     // 계좌 등록
     public boolean accountAdd(String account_pwd){
-        int uno = ConsoleSessionManager.getSession().userNo();
+        ConsoleSession session = ConsoleSessionManager.getSession();
+        if (session == null) {
+            System.out.println("세션이 없어서 계좌 해지 불가");
+            return false;
+        }
+        int uno = session.userNo();
         AccountDto dto = new AccountDto();
         dto.setAccount_pwd(account_pwd);
         dto.setUno(uno);
+
+
         return accountDao.accountAdd(dto);
     }
 
     // 계좌 해지
     public boolean accountDel( String account_no, String account_pwd) {
-        AccountDto dto = new AccountDto();
-        dto.setAccount_no(account_no);
-        dto.setAccount_pwd(account_pwd);
-        return accountDao.accountDel(dto);
+        Integer uno = accountDao.getUnoByAccount(account_no , account_pwd);
+        if (uno == null) {
+            System.out.println("일치하는 계좌가 없습니다.");
+            return false;
+        }
+        return accountDao.accountDel(account_no ,account_pwd ,uno);
     }
 
 
@@ -174,9 +184,19 @@ public class AccountController {
     }
 
     // 계좌번호로 거래내역 조회
-    public ArrayList<AccountDto> accountList(String account_no) {
-        return accountDao.accountList(account_no);
+    public ArrayList<AccountDto> accountList(String u_name) {
+        ArrayList<AccountDto> list = accountDao.accountList(u_name);
+
+        if (list.isEmpty()) {
+            System.out.println("해당 이름의 거래내역이 없습니다.");
+        } else {
+            for (AccountDto dto : list) {
+                System.out.println(u_name + "님의 거래내역" );
+            }
+        }
+        return list;
     }
+
 
 
 } // class e

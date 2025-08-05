@@ -1,10 +1,7 @@
 package bankService.view;
 
 import bankService.controller.AccountController;
-import bankService.model.dto.TransactionDto;
-import bankService.model.dto.TransactionResultDto;
-import bankService.model.dto.TransferDto;
-import bankService.model.dto.TransferResultDto;
+import bankService.model.dto.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -113,10 +110,29 @@ public class MainView {
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 내 계좌 목록 >");
-        System.out.println("uno 입력하세요..?"); int uno = scan.nextInt();
+        System.out.print("조회할 회원 이름을 입력하세요: ");
+        scan.nextLine();
+        String u_name = scan.nextLine();
 
-        ArrayList<String> result = accountController.accountListUno(uno);
-        System.out.println(result);
+        ArrayList<AccountDto> list = accountController.accountList(u_name);
+
+
+        if (list.isEmpty()) {
+            System.out.println("해당 이름의 거래내역이 없습니다.");
+        } else {
+            for (AccountDto dto : list) {
+                System.out.printf("[거래번호: %d] 계좌: %s | 출금: %d | 입금: %d | 유형: %s | 금액: %d | 메모: %s | 날짜: %s\n",
+                        dto.getTno(),
+                        dto.getAccount_no(),
+                        dto.getFrom_acno(),
+                        dto.getTo_acno(),
+                        dto.getType(),
+                        dto.getAmount(),
+                        dto.getMemo(),
+                        dto.getT_date()
+                );
+            }
+        }
 
     }
 

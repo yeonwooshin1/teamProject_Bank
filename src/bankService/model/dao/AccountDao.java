@@ -236,26 +236,71 @@ public class AccountDao {
         }
     }
 
+    // 계좌 존재 여부 및 uno 조회
+    public Integer getUnoByAccount(String account_no, String account_pwd) {
+        try {
+            String sql = "SELECT uno FROM account WHERE account_no = ? AND account_pwd = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ps.setString(2, account_pwd);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("uno");
+            }
+        } catch (Exception e) {
+            System.out.println("uno 조회 실패: " + e);
+        }
+        return null;
+    }
+
+
 
     // 계좌 해지
-    public boolean accountDel(AccountDto dto) { // 계좌번호 , 패스워드
+    public boolean accountDel(String account_no, String account_pwd, int uno) { // 계좌번호 , 패스워드
         try {
-            String sql = "DELETE FROM account WHERE account_no = ? AND account_pwd = ? AND uno = ? ";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, dto.getAccount_no());
-            ps.setString(2, dto.getAccount_pwd());
-            ps.setInt(3, dto.getUno());
+            conn.setAutoCommit(false);
 
-            int result = ps.executeUpdate();
+            // 1. 계좌번호에 대응하는 acno 조회
+            String selectAcnoSql = "SELECT acno FROM account WHERE account_no = ? AND account_pwd = ? AND uno = ?";
+            PreparedStatement ps1 = conn.prepareStatement(selectAcnoSql);
+            ps1.setString(1, account_no);
+            ps1.setString(2, account_pwd);
+            ps1.setInt(3, uno);
+            ResultSet rs = ps1.executeQuery();
+            if (!rs.next()) {
+                conn.rollback();
+                return false;
+            }
+            int acno = rs.getInt("acno");
+
+            // 2. transaction 테이블에서 거래내역 삭제
+            String delTxSql = "DELETE FROM transaction WHERE from_acno = ? OR to_acno = ?";
+            PreparedStatement ps2 = conn.prepareStatement(delTxSql);
+            ps2.setInt(1, acno);
+            ps2.setInt(2, acno);
+            ps2.executeUpdate();
+
+            // 3. account 테이블에서 계좌 삭제
+            String delAccountSql = "DELETE FROM account WHERE acno = ?";
+            PreparedStatement ps3 = conn.prepareStatement(delAccountSql);
+            ps3.setInt(1, acno);
+            int result = ps3.executeUpdate();
+
             if (result == 1) {
+                conn.commit();
                 return true;
             } else {
+                conn.rollback();
                 return false;
             }
 
         } catch (Exception e) {
+            try { conn.rollback(); } catch (Exception ex) {}
             System.out.println("계좌 해지 실패: " + e);
             return false;
+        } finally {
+            try { conn.setAutoCommit(true); } catch (Exception ex) {}
         }
     }
 
@@ -277,36 +322,35 @@ public class AccountDao {
         return accountList;
     }
 
-    // 계좌 조회
-    public ArrayList<AccountDto> accountList(String account_no) {
+    // 거래 내역 조회
+    public ArrayList<AccountDto> accountList(String u_name) {
         ArrayList<AccountDto> list = new ArrayList<>();
 
         try {
-            // 거래 내역 조회 (특정 계좌 기준, 최신순)
             String sql = "SELECT t.tno, a.account_no, t.from_acno, t.to_acno, t.type, t.amount, t.memo, t.t_date " +
                     "FROM transaction t " +
                     "JOIN account a ON t.from_acno = a.acno OR t.to_acno = a.acno " +
-                    "WHERE a.account_no = ? " +
+                    "JOIN user u ON a.uno = u.uno " +
+                    "WHERE u.u_name = ? " +
                     "ORDER BY t.t_date DESC";
+
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, account_no);
+            ps.setString(1, u_name);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 AccountDto dto = new AccountDto(
-                        rs.getInt("tno"),              // 거래 번호
-                        rs.getString("account_no"),    // 계좌번호
-                        rs.getInt("from_acno"),        // 출금 계좌
-                        rs.getInt("to_acno"),          // 입금 계좌
-                        rs.getString("type"),          // 거래 유형
-                        rs.getInt("amount"),           // 거래 금액
-                        rs.getString("memo"),          // 메모
-                        rs.getString("t_date")         // 거래 일자
+                        rs.getInt("tno"),
+                        rs.getString("account_no"),
+                        rs.getInt("from_acno"),
+                        rs.getInt("to_acno"),
+                        rs.getString("type"),
+                        rs.getInt("amount"),
+                        rs.getString("memo"),
+                        rs.getString("t_date")
                 );
-
-                list.add(dto); // 리스트 추가
+                list.add(dto);
             }
-
         } catch (Exception e) {
             System.out.println("거래내역 조회 실패: " + e);
         }

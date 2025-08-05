@@ -8,13 +8,25 @@ import bankService.model.dto.TransactionDto;
 import bankService.model.dto.TransactionResultDto;
 import bankService.model.dto.TransferDto;
 import bankService.model.dto.TransferResultDto;
+import bankService.service.OtpService;
+import bankService.util.ConsoleStatus;
 import bankService.view.MainView;
+
+import java.util.Scanner;
 
 public class TestAppStart {
     public static void main(String[] args) {
 
+        Scanner scan = new Scanner(System.in);
+        Object ioLock = new Object();
+        ConsoleStatus status = new ConsoleStatus(); // 더미 가능
+        OtpService otp = new OtpService();         // 더미 가능
+
+        // 🔧 여기에 세션 설정을 꼭 넣기
+        ConsoleSession session = new ConsoleSession(70, scan, ioLock, status, otp);
+        ConsoleSessionManager.setSession(session);
         // MainView test
-         //MainView.getInstance().mainIndex();
+         MainView.getInstance().mainIndex();
 
 //        // db 연동 테스트
 //        AccountDao dao = AccountDao.getInstance();
