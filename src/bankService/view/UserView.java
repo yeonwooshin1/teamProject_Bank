@@ -3,6 +3,7 @@ package bankService.view;
 import bankService.controller.OtpController;
 import bankService.controller.UserController;
 import bankService.model.dto.IdResponseDto;
+import bankService.service.OtpService;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-    private Scanner scan; private Object ioLock;
+    private Scanner scan; private Object ioLock; OtpService otpService;
 
 
     // 싱글톤 가져오기
@@ -28,9 +29,10 @@ public class UserView { // class start
     OtpController otpController = OtpController.getInstance();
 
    // wire
-   public void wire(Scanner scan , Object ioLock){
+   public void wire(Scanner scan , Object ioLock , OtpService otpService){
        this.scan = scan;
        this.ioLock = ioLock;
+       this.otpService = otpService;
    }   // wire end
 
     public int index() {

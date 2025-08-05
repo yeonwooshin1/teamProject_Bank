@@ -2,12 +2,14 @@ package bankService.app;  // package
 
 import bankService.controller.AccountController;
 import bankService.controller.OtpController;
+import bankService.controller.UserController;
 import bankService.service.OtpService;
 import bankService.util.ConsoleStatus;
 
 import bankService.view.MainView;
 import bankService.view.OtpView;
 import bankService.view.UserView;
+import com.sun.tools.javac.Main;
 
 import java.util.Scanner;
 
@@ -31,6 +33,7 @@ public final class AppRouter {  // class start
         final Scanner scan = new Scanner(System.in);
         final Object ioLock = new Object();
         final ConsoleStatus status = new ConsoleStatus();
+        final OtpService otp = new OtpService();
 
         // 싱글톤 가져오기
         final UserView login = UserView.getInstance();
@@ -40,7 +43,8 @@ public final class AppRouter {  // class start
         while (true) {
             // ========== 1) 로그인 ==========
             // wire 연결
-            login.wire(scan, ioLock);
+            login.wire(scan, ioLock , otp);
+            OtpController.getInstance().wireOtp( otp);
 
             // 로그인 view 결과값 반환
             // 양수 = 성공 / uno 저장용으로 반환값 쓸 예정
@@ -63,31 +67,32 @@ public final class AppRouter {  // class start
             int uno = result;
 
             // ========== 2) 메인서비스 시작 ==========
-            // otp 단 하나로 공유할 객체 생성
-            OtpService otp = new OtpService();
 
             // 로그인 직후 otp 2분 신뢰 시작
             otp.grantTrustNowForLogin();
 
             // context 값 할당
-            // 유저넘버 , 락 객체 , 신뢰기간 , OTP서비스
             ConsoleSession ctx = new ConsoleSession(uno, scan, ioLock, status, otp);
+
+            // 유저넘버 , 락 객체 , 신뢰기간 , OTP서비스
+            AccountController.getInstance().wire(ctx.userNo() ,ctx.otp());
+            OtpController.getInstance().wireUno(ctx.userNo());
+            UserController.getInstance().wire(ctx.userNo() , ctx.otp());
+
 
             // 재인증 뷰 연결(같은 otp/scan/status/ioLock)
             OtpView.getInstance().wire(ctx.otp(), ctx.scan(), ctx.status(), ctx.ioLock());
-            // 컨트롤러(출금/입금)에도 같은 otp 주입(DAO는 필요 시 추가)
-            AccountController.getInstance().wire(ctx.userNo() ,ctx.otp());
-            OtpController.getInstance().wire(ctx.userNo() , ctx.otp());
 
-            // 메인 세션 입장(스레드 시작)
-            main.mainIndex(ctx);
+            // wire 주입
+            main.wire(ctx);
 
-            // ========== 3) 메인 세션 루프(B 패턴) ==========
+            // ========== 3) 메인 세션  ==========
             while (true) {
-
+                // 메인 세션 입장(스레드 시작)
+                boolean mainResult = main.mainIndex();
+                if (!mainResult) break;
 
             }   // while end
-
         } // while end
     }   // func end
 }   // class end
