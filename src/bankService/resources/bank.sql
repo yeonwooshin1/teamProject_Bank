@@ -260,4 +260,3 @@ INSERT INTO transaction (from_acno, to_acno, amount, type, memo, t_date) VALUES
 select * from user;
 select * from account;
 select * from transaction;
-select from_acno , to_acno , amount from transaction where from_acno = 1010 or to_acno = 1011;
