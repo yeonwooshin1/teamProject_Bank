@@ -4,13 +4,15 @@ import bankService.model.dao.AccountDao;
 import bankService.model.dto.*;
 import bankService.service.OtpService;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class AccountController {
     // 입금 , 출금 , 이체
 
     // 싱글톤 생성
-    private AccountController(){}
+    public AccountController(){}
     private static final AccountController instance = new AccountController();
     public static AccountController getInstance(){
         return instance;
@@ -161,6 +163,13 @@ public class AccountController {
             System.out.println("세션이 없어서 계좌 해지 불가");
             return false;
         }
+
+        // 비밀번호 유효성 검사 추가
+        if (account_pwd == null || !account_pwd.matches("\\d{6}")) {
+            System.out.println("비밀번호는 6자리 숫자여야 합니다.");
+            return false;
+        }
+
         AccountDto dto = new AccountDto();
         dto.setAccount_pwd(account_pwd);
         dto.setUno(uno);
@@ -169,13 +178,28 @@ public class AccountController {
     }
 
     // 계좌 해지
+    // 계좌 해지
     public boolean accountDel( String account_no, String account_pwd) {
-        Integer uno = accountDao.getUnoByAccount(account_no , account_pwd);
-        if (uno == null) {
-            System.out.println("일치하는 계좌가 없습니다.");
+        // 계좌 번호 일치하지 않을시
+        if (!accountDao.accountnoexists(account_no)) {
+            System.out.println("존재하지 않는 계좌번호 입니다.");
             return false;
         }
-        return accountDao.accountDel(account_no ,account_pwd ,uno);
+
+        // 비밀번호 일치 x
+        Integer uno = accountDao.getUnoByAccount(account_no, account_pwd);
+        if (uno == null) {
+            System.out.println("계좌 비밀번호가 일치하지 않습니다.");
+            return false;
+        }
+        // 계좌 해지 시 잔액있음 불가
+        int acno = accountDao.getAcnoByAccountNo(account_no);
+        int balance = accountDao.isBalance(acno);
+        if (balance > 0) {
+            System.out.println("해지하시려는 계좌 잔액이 남아있습니다. 잔액 이동 후 해지해주세요.");
+            return false;
+        }
+        return accountDao.accountDel(account_no, account_pwd, uno);
     }
 
 
@@ -184,24 +208,20 @@ public class AccountController {
         return accountDao.accountCheck(account_no);
     }
 
-    // 계좌 조회
-    // uno로 계좌번호 리스트 받기
-    public ArrayList<String> accountListUno(int uno) {
-        return accountDao.accountListUno(uno);
-    }
 
-    // 계좌번호로 거래내역 조회
-    public ArrayList<AccountDto> accountList(String u_name) {
-        ArrayList<AccountDto> list = accountDao.accountList(u_name);
+    // 현재 로그인된 사용자 기준 계좌별 거래내역 Map 반환
+    public Map<String, List<AccountDto>> getTransactionsByCurrentUser() {
+        Map<String, List<AccountDto>> result = new LinkedHashMap<>();
 
-        if (list.isEmpty()) {
-            System.out.println("해당 이름의 거래내역이 없습니다.");
-        } else {
-            for (AccountDto dto : list) {
-                System.out.println(u_name + "님의 거래내역" );
-            }
+        ArrayList<String> accList = accountDao.accountListUno(this.uno);
+
+        for (String accNo : accList) {
+            List<AccountDto> txList = accountDao.accountListByAccountNo(accNo);
+            txList.sort(Comparator.comparing(AccountDto::getT_date)); // 정렬
+            result.put(accNo, txList);
         }
-        return list;
+
+        return result;
     }
 
 } // class e
