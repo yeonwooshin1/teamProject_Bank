@@ -141,6 +141,12 @@ public class AccountController {
             return new TransferResultDto(false , "잔액이 부족합니다." , balance);
         } // if e
 
+
+        // 같은 계좌에서 이체 불가
+        if (from_acno == to_acno) {
+            return new TransferResultDto(false, "같은 계좌로 이체할 수 없습니다.", balance);
+        }
+
         // 거래내역 저장
         boolean isSaved = accountDao.saveTransaction(from_acno , to_acno , amount , memo , "이체");
         if(!isSaved){

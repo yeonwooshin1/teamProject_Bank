@@ -110,7 +110,7 @@ public class AccountDao {
 
             if("이체".equals(type)){
 
-                // 출금 내역 저장 (from_acno -> 은행계좌)
+                // ① 출금 내역 → from → 은행(1001) : "이체_출금"
                 String withdrawSql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(withdrawSql)){
@@ -118,12 +118,12 @@ public class AccountDao {
                     ps.setInt(1 , from);
                     ps.setInt(2 , 1001);    // 은행계좌
                     ps.setInt(3, amount);
-                    ps.setString(4,"출금");
+                    ps.setString(4,"이체_출금");
                     ps.setString(5, memo);
                     ps.executeUpdate();
                 } // try e
 
-                // 입금 내역 저장 (은행계좌 -> to_acno)
+                // ② 입금 내역 → 은행(1001) → to : "이체_입금"
                 String depositSql =  "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(depositSql)){
@@ -131,14 +131,14 @@ public class AccountDao {
                     ps.setInt(1, 1001);
                     ps.setInt(2, to);
                     ps.setInt(3, amount);
-                    ps.setString(4, "입금");
+                    ps.setString(4, "이체_입금");
                     ps.setString(5,memo);
                     ps.executeUpdate();
                 } // try e
 
             } // if e
             else {
-                // 입금 or 출금
+                // 단일 거래 (입금 or 출금) 저장
                 String sql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(sql)){
