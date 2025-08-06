@@ -69,6 +69,30 @@ public class UserController { // class start
                               String u_name, String u_phone, String u_email, String u_date) {
         if (!u_pwd1.equals(u_pwd2)) return -2;
 
+
+        // 비밀번호에 영어,숫자,특수문자가 다 포함되게 하려면 '정규표현식'을 사용해야함
+        //(?=.*[A-Za-z]) : 영어 1개 이상 포함
+        //(?=.*\\d) : 숫자 1개 이상 포함
+        //(?=.*[!@#$%^&*...]) : 특수문자 1개 이상 포함
+
+        //. : 아무 문자 하나
+        //* : 0개 이상 반복
+        //+ : 1개 이상 반복
+        //[A-Za-z] : 영어 대소문자 하나
+        //\\d : 숫자
+        //^ : 문자열의 시작
+        //$ : 문자열의 끝
+        //(?=...) : "반드시 ...을 포함해야 한다"는 조건
+
+        // 예를 들어 ^[0-9]{3}$ 이렇게 되어있으면 0-9까지 숫자만으로 이루어진 3자리 이런 느낌
+
+        //정규표현식  = 특정 패턴이 포함되는지 체크하는 식
+        String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-\\[\\]{};':\"\\\\|,.<>/?]).+$";
+        if (!u_pwd1.matches(pwPattern)) {
+            System.out.println("비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다.");
+            return -5;
+        }
+
         // 리스트 만들어서
         ArrayList<String> hostList = new ArrayList<>();
         hostList.add("gmail.com");

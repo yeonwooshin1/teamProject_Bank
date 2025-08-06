@@ -212,6 +212,7 @@ public class UserView { // class start
             case -2 -> System.out.println("❌ 입력하신 두 비밀번호가 일치하지 않습니다.");
             case -3 -> System.out.println("❌ 형식 오류가 발생했습니다.");
             case -4 -> System.out.println("❌ 이메일이 잘못 입력되었습니다.");
+            case -5 -> System.out.println( "❌ 비밀번호에는 영어, 숫자, 특수문자가 다 포함되어야 합니다." );
         }
     } // func end
 
