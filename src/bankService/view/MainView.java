@@ -178,6 +178,7 @@ public class MainView { // class start
         return true;
     }   // func end
 
+    // 계좌 생성 view
     public boolean accountAdd() {
         if (!ensureAuthenticated()) return false;
         System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
@@ -192,7 +193,7 @@ public class MainView { // class start
                 break; // 조건 만족하면 탈출
             }
             System.out.println("비밀번호는 6자리 숫자여야 합니다. 다시 입력해주세요.");
-        }
+        }   // while end
 
         boolean result = accountController.accountAdd(account_pwd);
 
@@ -200,10 +201,10 @@ public class MainView { // class start
             System.out.println("계좌가 개설되었습니다.");
         } else {
             System.out.println("계좌 개설 실패");
-        }
+        }   // if end
 
         return true;
-    }
+    }   // func end
 
     // 계좌 해지 view
     public boolean accountDel(){
@@ -254,9 +255,9 @@ public class MainView { // class start
                         MoneyUtil.formatWon((int)balance),
                         tx.getT_date(),
                         tx.getMemo() == null ? "null" : tx.getMemo());
-            }
-        }
-    }
+            }   // for end
+        }   // for end
+    }   // func end
 
     // ================================ 입·출금 , 이체 ================================ //
 
