@@ -3,6 +3,8 @@ package bankService.view;
 import bankService.controller.OtpController;
 import bankService.controller.UserController;
 import bankService.model.dto.IdResponseDto;
+import bankService.service.OtpService;
+import org.jline.reader.LineReader;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -20,20 +22,23 @@ public class UserView { // class start
     }
 
     // 공용 리소스(라우터에서 1회 주입)
-//    private Scanner scan; private Object ioLock;
-    Scanner scan = new Scanner(System.in);
-    Object ioLock = new Object();
+    private Scanner scan; private Object ioLock; OtpService otpService; LineReader reader;
+
 
     // 싱글톤 가져오기
     UserController userController = UserController.getInstance();
     OtpController otpController = OtpController.getInstance();
 
-//    // wire
-//    public void wire(Scanner scan , Object ioLock){
-//        this.scan = scan;
-//        this.ioLock = ioLock;
-//    }   // wire end
+   // wire
+   public void wire(Scanner scan, LineReader reader , Object ioLock , OtpService otpService){
+       this.scan = scan;
+       this.ioLock = ioLock;
+       this.otpService = otpService;
+       this.reader = reader;
+   }   // wire end
 
+
+    // 시작 로그인 view
     public int index() {
         synchronized (ioLock) {
             try {
@@ -98,9 +103,10 @@ public class UserView { // class start
         } else {
             System.out.println("로그인창으로 이동합니다.");
             return 0;
-        }
+        }   // if end
     }   // func end
 
+    // 로그인시 otp 발급 여부 묻기 메소드
     private boolean otpRequiredPromptLogin() {
         while (true) {
             System.out.println("안전한 서비스 이용을 위해 최초 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
@@ -110,20 +116,22 @@ public class UserView { // class start
             if ("Y".equalsIgnoreCase(choose)) return true;
             else if ("N".equalsIgnoreCase(choose)) return false;
             else System.out.println("Y 또는 N 중에 선택해주세요.");
-        }
-    }
+        }   // while end
+    }   // func end
 
+    // otp 발급을 받겠다할 시 실행시킬 것 로그인 전용
     private boolean handleOtpProcess(int uno) {
         String email = otpController.findEmail(uno);
         boolean result = handleOtpProcess(email ,1);
         return result;
 
-    }
+    }   // func end
 
+    // otp 발급 (로그인 1, 비밀번호찾기 2)
     public boolean handleOtpProcess(String email , int value){
         while (true) {
-            if (value == 1) otpController.getIssuePW(email);
-            else if (value == 2) otpController.getIssueLogin(email);
+            if (value == 1) otpController.getIssueLogin(email);
+            else if (value == 2) otpController.getIssuePW(email);
             System.out.println("등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
 
             boolean verified = handleOtpInput();
@@ -135,11 +143,11 @@ public class UserView { // class start
             if (!"Y".equalsIgnoreCase(re)) {
                 System.out.println("로그인창으로 이동합니다.");
                 return false;
-            }
-        }
-    }
+            }   // if end
+        }   // while end
+    }   // func end
 
-
+    // otp 입력 뷰
     private boolean handleOtpInput() {
 
         while (true) {
@@ -171,10 +179,10 @@ public class UserView { // class start
                 default -> {
                     System.out.println("알 수 없는 오류입니다. 다시 시도해주세요.");
                     return false;
-                }
-            }
-        }
-    }
+                }   // default
+            }   // switch end
+        }   // while end
+    }   // func end
 
 
     //----------------------------------------------------------------------------------------------------//
@@ -250,10 +258,5 @@ public class UserView { // class start
             System.out.println("입력 정보에 맞는 계정을 찾을 수 없습니다.");
         } // if end
     } // func end
-
-
-    //----------------------------------------------------------------------------------------------------//
-
-
 
 } // class end

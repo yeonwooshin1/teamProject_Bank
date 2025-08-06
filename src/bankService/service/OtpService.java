@@ -151,6 +151,7 @@ public class OtpService {   // class start
         return different == 0;
     }   // func end
 
+    // 남은 시간 계산하는 메소드
     public synchronized long getRemainingTrustSeconds() {
         return (session==null||session.getTrustUntil()==null)? 0
                 : Math.max(0, session.getTrustUntil().getEpochSecond()

@@ -3,6 +3,7 @@ package bankService.controller;
 import bankService.model.dao.UserDao;
 import bankService.model.dto.IdResponseDto;
 import bankService.model.dto.UserDto;
+import bankService.service.OtpService;
 import bankService.util.EmailValidationUtil;
 
 import java.time.LocalDate;
@@ -24,7 +25,16 @@ public class UserController { // class start
     //싱글톤 가져오기
     private UserDao userDao = UserDao.getInstance();
 
+    // wire 멤버변수
+    OtpService otpService;
+    int uno;
 
+    // wire 세션 연결
+    public void wire (int uno, OtpService otp){
+        this.uno = uno;
+        this.otpService = otp;
+    }
+    // 실패시 count 해주는 map
     Map<String, Integer> loginFailMap = new HashMap<>();
 
     // 로그인
