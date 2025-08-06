@@ -236,7 +236,7 @@ public class MainView { // class start
         if (txMap.isEmpty()) {
             System.out.println("거래 내역이 없습니다.");
             return;
-        }
+        }   // if end
 
         for (String accNo : txMap.keySet()) {
             System.out.println("\n계좌번호: " + accNo);
