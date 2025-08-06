@@ -83,9 +83,9 @@ public class UserView { // class start
 
     // 1. 로그인
     public int login() {
-        System.out.print("아이디를 입력해주세요 : ");
+        System.out.print("아이디를 입력해주세요( 소문자 입력 ) : ");
         String u_id = scan.next();
-        System.out.print("비밀번호를 입력해주세요 : ");
+        System.out.print("비밀번호를 입력해주세요( 소문자 입력 ) : ");
         String u_pwd = scan.next();
         int result = userController.login(u_id, u_pwd);
         if (result == -1) {
@@ -191,7 +191,7 @@ public class UserView { // class start
     public void register() {
         System.out.print("아이디를 입력하세요 : ");
         String u_id = scan.next();
-        System.out.print("비밀번호를 입력하세요 : ");
+        System.out.print("비밀번호를 입력하세요( 영어, 숫자, 특수문자 포함 8글자 ) : ");
         String u_pwd1 = scan.next();
         System.out.print("비밀번호 확인: ");
         String u_pwd2 = scan.next();
@@ -212,6 +212,7 @@ public class UserView { // class start
             case -2 -> System.out.println("❌ 입력하신 두 비밀번호가 일치하지 않습니다.");
             case -3 -> System.out.println("❌ 형식 오류가 발생했습니다.");
             case -4 -> System.out.println("❌ 이메일이 잘못 입력되었습니다.");
+            case -5 -> System.out.println( "❌ 비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다." );
         }
     } // func end
 
