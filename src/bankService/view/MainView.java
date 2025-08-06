@@ -427,7 +427,7 @@ public class MainView { // class start
 
             boolean result = userController.update2Password(u_id, newPwd);
             if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-            else        System.out.println("비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
+            else  System.out.println("비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
         } else {
             System.out.println("비밀번호가 일치하지 않습니다.");
         }   // if end

@@ -169,11 +169,11 @@ public class UserController { // class start
         String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-\\[\\]{};':\"\\\\|,.<>/?]).{8,}$";
         if (!new_pwd.matches(pwPattern)) {
             return false; // 유효성 실패 시 false 반환
-        }
+        }   // if end
 
         // 기존 로직 그대로
         return userDao.update2Password(u_id, new_pwd);
-    }
+    }   // func end
 
     //----------------------------------------------------------------------------------------------------//
 
