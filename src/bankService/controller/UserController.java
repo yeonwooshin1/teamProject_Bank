@@ -89,7 +89,6 @@ public class UserController { // class start
         //정규표현식  = 특정 패턴이 포함되는지 체크하는 식
         String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-\\[\\]{};':\"\\\\|,.<>/?]).{8,}$";
         if (!u_pwd1.matches(pwPattern)) {
-            System.out.println("비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다.");
             return -5;
         }
 
