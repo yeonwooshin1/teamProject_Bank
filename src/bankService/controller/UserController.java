@@ -8,6 +8,7 @@ import bankService.util.EmailValidationUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,11 +70,12 @@ public class UserController { // class start
         if (!u_pwd1.equals(u_pwd2)) return -2;
 
         // ★ String → LocalDate 변환
+
         LocalDate birth;
         try {
             birth = LocalDate.parse(u_date); // "2025-07-31" 같은 형식
         } catch (DateTimeParseException e) {
-            System.out.println("생년월일 형식 오류");
+            System.out.println("생년월일 형식 오류입니다");
             return -3;
         }
 
