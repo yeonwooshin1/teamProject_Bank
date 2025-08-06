@@ -26,15 +26,16 @@ public class OtpGuardianThread extends Thread { // class start
         this.otpService = otpService;
         this.reauthNeeded = reauthNeeded;
         this.pollMillis = (pollMillis <= 0) ? 700 : pollMillis;
-        setName("OtpGuardianThread");
-        setDaemon(true); // 앱 종료 시 자동 종료
+        setName("OtpGuardianThread"); // 스레드 이름 지정 (디버깅에 도움)
+        setDaemon(true); // 메인 프로그램 종료 시 이 스레드도 자동 종료되도록 설정
     }   // 생성자 end
 
     @Override
-    public void run() {
+    public void run() { // run 스레드 실행 루프
         try {
+            // 스레드가 중단되지 않는 한 무한 루프
             while (!isInterrupted()) {
-                Thread.sleep(pollMillis);
+                Thread.sleep(pollMillis); // 지정된 주기만큼 대기
                 if (!otpService.checkValidUntil()) {
                     reauthNeeded.compareAndSet(false, true); // 이미 true면 유지
                 }

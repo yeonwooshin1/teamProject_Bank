@@ -58,6 +58,7 @@ public class MainView { // class start
      * - 이 메서드는 단순히 문자열만 갱신한다! (println에서 직접 출력)
      */
     public void setStatusBar(String msg) {
+        if (this.statusBar != null && this.statusBar.equals(msg)) return; // 중복 방지
         this.statusBar = msg;   // 메뉴 출력 이후 하단에 출력 용도
     }
 

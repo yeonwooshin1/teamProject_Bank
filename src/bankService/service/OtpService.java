@@ -13,7 +13,7 @@ public class OtpService {   // class start
 
     // 절대 변하지 않는 상수
     private static final Duration INPUT_UNTIL = Duration.ofMinutes(2); // 발급 후 입력시간 2분 제한
-    private static final Duration VALID_UNTIL = Duration.ofMinutes(2); // 성공 후 유효시간 2분 신뢰
+    private static final Duration VALID_UNTIL = Duration.ofMinutes(1); // 성공 후 유효시간 2분 신뢰
     private static final int MAX_ATTEMPTS = 3;                          // 실패 횟수 최대 3회
 
     // Otp 발급 상태 dto -> null 이면 발급 전/만료
@@ -108,6 +108,13 @@ public class OtpService {   // class start
             }   // if end
             return  4;     // println("입력하신 OTP가 일치하지 않습니다. 정확히 확인하신 후 다시 시도하여 주시기 바랍니다. \n * 3회 실패시 새로운 OTP 발급필요 *")
         }   // if end
+
+        try {
+            // 💡 스레드가 최신 상태를 반영하기 전에 불필요한 메시지 출력 방지용
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // 현재 스레드 인터럽트 상태 복원
+        }
 
         // 모든 유효성 검사가 끝났다면 성공값 리턴과 검증 유효시간 설정
         // ** Instant.plus()  지정된 시각에 ()안의 값을 더해서 시각을 나타내는 메소드 **
