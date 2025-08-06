@@ -209,24 +209,58 @@ public class UserDao { // class start
     //----------------------------------------------------------------------------------------------------//
 
 
+//    // 계정 탈퇴
+//    public boolean deleteAccount(String u_id, String u_pwd) {
+//        String sql = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
+//        try (
+//                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+//                PreparedStatement ps = conn.prepareStatement(sql)
+//        ) {
+//            ps.setString(1, u_id);
+//            ps.setString(2, u_pwd);
+//            int deleted = ps.executeUpdate();
+//            return deleted == 1; // 1명 삭제됐으면 true
+//        } catch (SQLException e) {
+//            System.out.println( "SQLException 오류 발생" + e);
+//            return false; // 예외 시 실패
+//        }
+//    }
     // 계정 탈퇴
+
     public boolean deleteAccount(String u_id, String u_pwd) {
-        String sql = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
-        try (
-                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, u_id);
-            ps.setString(2, u_pwd);
-            int deleted = ps.executeUpdate();
-            return deleted == 1; // 1명 삭제됐으면 true
-        } catch (SQLException e) {
-            System.out.println( "계좌 잔액 있음");
-            return false; // 예외 시 실패
+        // 코드가 겹치니까 미리 위에다가 다 선언
+
+        // 먼저 입력한 아이디로 uno를 찾고나서 uno에 맞는 acno 찾고 해당되면 삭제
+        String sql0 = "DELETE FROM transaction WHERE from_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)) OR to_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?))";
+        String sql1 = "DELETE FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
+        String sql2 = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
+
+        // try 여러 개에 catch 하나 가능 괄호 처리
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // 거래내역 삭제
+            // 쿼리문이 다르면 다 다르게 만들어야함
+            try (PreparedStatement ps0 = conn.prepareStatement(sql0)) {
+                ps0.setString(1, u_id);
+                ps0.setString(2, u_id);
+                ps0.executeUpdate();
+            }
+            // 계좌 삭제
+            try (PreparedStatement ps1 = conn.prepareStatement(sql1)) {
+                ps1.setString(1, u_id);
+                ps1.executeUpdate();
+            }
+            // 유저 삭제
+            try (PreparedStatement ps2 = conn.prepareStatement(sql2)) {
+                ps2.setString(1, u_id);
+                ps2.setString(2, u_pwd);
+                int deleted = ps2.executeUpdate();
+                return deleted == 1;
+            }
+        } catch (Exception e) {
+            System.out.println("SQL 오류 발생 " + e);
         }
     }
 
-    // ghoon1210@gmail.com
 }
 
 

@@ -4,13 +4,15 @@ import bankService.model.dao.AccountDao;
 import bankService.model.dto.*;
 import bankService.service.OtpService;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 public class AccountController {
     // 입금 , 출금 , 이체
 
     // 싱글톤 생성
-    private AccountController(){}
+    public AccountController(){}
     private static final AccountController instance = new AccountController();
     public static AccountController getInstance(){
         return instance;
@@ -161,18 +163,21 @@ public class AccountController {
             System.out.println("세션이 없어서 계좌 해지 불가");
             return false;
         }
-        if (account_pwd.length() >= 4 && account_pwd.length() <= 10) {
-            AccountDto dto = new AccountDto();
-            dto.setAccount_pwd(account_pwd);
-            dto.setUno(uno);
 
-            return accountDao.accountAdd(dto);
-        }else {
-            System.out.println("계좌 비밀번호 4글자 이상 10글자 이하로 설정해주세요");
+        // 비밀번호 유효성 검사 추가
+        if (account_pwd == null || !account_pwd.matches("\\d{6}")) {
+            System.out.println("비밀번호는 6자리 숫자여야 합니다.");
             return false;
         }
+
+        AccountDto dto = new AccountDto();
+        dto.setAccount_pwd(account_pwd);
+        dto.setUno(uno);
+
+        return accountDao.accountAdd(dto);
     }
 
+    // 계좌 해지
     // 계좌 해지
     public boolean accountDel( String account_no, String account_pwd) {
         // 계좌 번호 일치하지 않을시
@@ -197,31 +202,26 @@ public class AccountController {
         return accountDao.accountDel(account_no, account_pwd, uno);
     }
 
+
     // 계좌번호 중복 검증
     public boolean accountCheck(String account_no) {
         return accountDao.accountCheck(account_no);
     }
 
-    // 계좌 조회
-    // uno로 계좌번호 리스트 받기
-    public ArrayList<String> accountListUno(int uno) {
-        return accountDao.accountListUno(uno);
-    }
 
-    // 계좌번호로 거래내역 조회
-    public ArrayList<AccountDto> accountList(String u_name) {
-        ArrayList<AccountDto> list = accountDao.accountList(u_name);
+    // 현재 로그인된 사용자 기준 계좌별 거래내역 Map 반환
+    public Map<String, List<AccountDto>> getTransactionsByCurrentUser() {
+        Map<String, List<AccountDto>> result = new LinkedHashMap<>();
 
-        if (list.isEmpty()) {
-            System.out.println("해당 이름의 거래내역이 없습니다.");
-        } else {
-            for (AccountDto dto : list) {
-                System.out.println(u_name + "님의 거래내역" );
-            }
+        ArrayList<String> accList = accountDao.accountListUno(this.uno);
+
+        for (String accNo : accList) {
+            List<AccountDto> txList = accountDao.accountListByAccountNo(accNo);
+            txList.sort(Comparator.comparing(AccountDto::getT_date)); // 정렬
+            result.put(accNo, txList);
         }
-        return list;
+
+        return result;
     }
-
-
 
 } // class e
