@@ -245,8 +245,8 @@ public class MainView { // class start
             long balance = 0;
             for (AccountDto tx : txMap.get(accNo)) {
                 switch (tx.getType()) {
-                    case "입금" -> balance += tx.getAmount();
-                    case "출금", "이체" -> balance -= tx.getAmount();
+                    case "입금", "이체_입금" -> balance += tx.getAmount();
+                    case "출금", "이체_출금" -> balance -= tx.getAmount();
                 }
 
                 System.out.printf("%-10s %-15s %-15s %-20s %10s\n",
