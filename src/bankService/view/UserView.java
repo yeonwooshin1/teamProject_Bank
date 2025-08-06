@@ -255,7 +255,7 @@ public class UserView { // class start
             if (result == 1)
                 System.out.println("✅ 비밀번호 변경이 완료되었습니다.");
             else
-                System.out.println("❌ 비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
+                System.out.println("❌ 비밀번호 변경에 실패했습니다.");
         } else {
             System.out.println("❌ 입력 정보에 맞는 계정을 찾을 수 없습니다.");
         } // if end
