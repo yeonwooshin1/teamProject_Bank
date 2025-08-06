@@ -17,9 +17,12 @@ public class UserDao { // class start
     }
 
     // 싱글톤
-    private UserDao(){}
+    private UserDao() {
+    }
+
     private static final UserDao instance = new UserDao();
-    public static UserDao getInstance(){
+
+    public static UserDao getInstance() {
         return instance;
     }
 
@@ -31,8 +34,7 @@ public class UserDao { // class start
     UserDto dto = new UserDto();
 
     // 로그인
-    public int login( UserDto dto ) {
-
+    public int login(UserDto dto) {
 
 
         String sql = "SELECT uno FROM user WHERE u_id = ? AND u_pwd = ?";
@@ -46,11 +48,11 @@ public class UserDao { // class start
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
-                int uno = rs.getInt( "uno");
+                int uno = rs.getInt("uno");
                 return uno;
             }
 
-        } catch ( Exception e) {
+        } catch (Exception e) {
             System.out.println("SQLException 오류 발생 " + e.getMessage());
         }
 
@@ -63,14 +65,14 @@ public class UserDao { // class start
     // 회원가입
     public int registerMember(UserDto dto) {
         // 1) 아이디 중복 체크용 SQL
-        String checkSql  = "SELECT COUNT(*) FROM `user` WHERE `u_id` = ?";
+        String checkSql = "SELECT COUNT(*) FROM `user` WHERE `u_id` = ?";
         // 2) 실제 INSERT용 SQL (u_email, u_date 포함)
         String insertSql = """
                 INSERT INTO `user`(u_id, u_pwd, u_name, u_phone, u_email, u_date) VALUES(?,    ?,     ?,      ?,       ?,       ?)
                 """;
 
         try (
-                Connection conn       = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 PreparedStatement chk = conn.prepareStatement(checkSql);
                 PreparedStatement ins = conn.prepareStatement(insertSql);
         ) {
@@ -102,7 +104,6 @@ public class UserDao { // class start
     }
 
 
-
     //----------------------------------------------------------------------------------------------------//
 
     // 아이디찾기
@@ -121,7 +122,7 @@ public class UserDao { // class start
                 }
             }
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생 " + e );
+            System.out.println("SQLException 오류 발생 " + e);
         }
         return null; // 못 찾으면 null 반환
     }
@@ -143,7 +144,7 @@ public class UserDao { // class start
                 }
             }
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println("SQLException 오류 발생" + e);
         }
         return 0; // 계정 없음
     }
@@ -162,7 +163,7 @@ public class UserDao { // class start
             int updated = ps.executeUpdate();
             return (updated == 1) ? 1 : 0;  // 1: 변경 성공, 0: 변경 실패(아이디 없음 등)
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println("SQLException 오류 발생" + e);
             return 0; // DB오류도 실패로 처리
         }
     }
@@ -182,7 +183,7 @@ public class UserDao { // class start
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println("SQLException 오류 발생" + e);
             return false;
         }
     }
@@ -201,7 +202,7 @@ public class UserDao { // class start
             int updated = ps.executeUpdate();
             return updated == 1; // true: 변경 성공, false: 실패(아이디 틀림 등)
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println("SQLException 오류 발생" + e);
             return false; // 예외도 실패 처리
         }
     }
@@ -258,9 +259,9 @@ public class UserDao { // class start
             }
         } catch (Exception e) {
             System.out.println("SQL 오류 발생 " + e);
+            return false;
         }
     }
-
 }
 
 

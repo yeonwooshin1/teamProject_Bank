@@ -178,7 +178,6 @@ public class AccountController {
     }
 
     // 계좌 해지
-    // 계좌 해지
     public boolean accountDel( String account_no, String account_pwd) {
         // 계좌 번호 일치하지 않을시
         if (!accountDao.accountnoexists(account_no)) {

@@ -256,20 +256,6 @@ public class AccountDao {
         return null;
     }
 
-    // 해지할 계좌 번호 일치 x
-    public boolean accountnoexists(String account_no) {
-        try{
-            String sql = "select 1 from account where account_no = ? ";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, account_no);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        }catch (Exception e){
-            System.out.println("존재하지않음"+e);
-            return false;
-        }
-
-    }
 
     // 해지할 계좌 번호 일치 x
     public boolean accountnoexists(String account_no) {
