@@ -7,10 +7,18 @@ import bankService.controller.UserController;
 import bankService.model.dto.*;
 import bankService.service.OtpService;
 import bankService.thread.OtpRemainingTimeViewThread;
+import bankService.util.MoneyUtil;
 import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 import org.jline.reader.EndOfFileException;
+import bankService.model.dto.AccountDto;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
+
+import java.awt.*;
 import java.util.ArrayList;
 
 // 메인 뷰
@@ -162,7 +170,7 @@ public class MainView { // class start
 
         if(choose ==1 ){ accountAdd(); }
         else if (choose == 2 ){ accountDel(); }
-        else if (choose == 3){ accountList(); }
+        else if (choose == 3){ printMyTransactions(); }
         else if (choose == 4){ return true; }
         else {
             System.out.println("잘못된 입력입니다.");
@@ -170,25 +178,32 @@ public class MainView { // class start
         return true;
     }   // func end
 
-    public boolean accountAdd(){
+    public boolean accountAdd() {
         if (!ensureAuthenticated()) return false;
         System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 새 계좌 개설 >");
-        String account_pwd = readLine("계좌 비밀번호 설정 :");
 
-        if (!ensureAuthenticated()) return false;
+        String account_pwd;
+        while (true) {
+            account_pwd = readLine("계좌 비밀번호 설정 (6자리 숫자): ");
+            if (account_pwd.length() == 6 && account_pwd.matches("\\d{6}")) {
+                break; // 조건 만족하면 탈출
+            }
+            System.out.println("비밀번호는 6자리 숫자여야 합니다. 다시 입력해주세요.");
+        }
 
         boolean result = accountController.accountAdd(account_pwd);
 
-        if(result){
+        if (result) {
             System.out.println("계좌가 개설되었습니다.");
-        }else {
-            System.out.println("계좌 개설 실패 ");
-        }  // if end
+        } else {
+            System.out.println("계좌 개설 실패");
+        }
+
         return true;
-    }   // func end
+    }
 
     // 계좌 해지 view
     public boolean accountDel(){
@@ -214,36 +229,34 @@ public class MainView { // class start
     }
 
     // 계좌 목록 view
-    public boolean accountList(){
-        if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
-        System.out.println("< 내 계좌 목록 >");
-        String u_name = readLine("조회할 회원 이름을 입력하세요:");
+    public void printMyTransactions() {
+        Map<String, List<AccountDto>> txMap = accountController.getTransactionsByCurrentUser();
 
-        if (!ensureAuthenticated()) return false;
+        if (txMap.isEmpty()) {
+            System.out.println("거래 내역이 없습니다.");
+            return;
+        }
 
-        ArrayList<AccountDto> list = accountController.accountList(u_name);
+        for (String accNo : txMap.keySet()) {
+            System.out.println("\n계좌번호: " + accNo);
+            System.out.printf("%-10s %-15s %-15s %-20s %-10s\n", "거래유형", "금액", "잔액", "거래일자", "메모");
 
-        if (list.isEmpty()) {
-            System.out.println("해당 이름의 거래내역이 없습니다.");
-        } else {
-            for (AccountDto dto : list) {
-                System.out.printf("[거래번호: %d] 계좌: %s | 출금: %d | 입금: %d | 유형: %s | 금액: %d | 메모: %s | 날짜: %s\n",
-                        dto.getTno(),
-                        dto.getAccount_no(),
-                        dto.getFrom_acno(),
-                        dto.getTo_acno(),
-                        dto.getType(),
-                        dto.getAmount(),
-                        dto.getMemo(),
-                        dto.getT_date()
-                );
-            }   // for end
-        }   // if end
-        return true;
-    }   // func end
+            long balance = 0;
+            for (AccountDto tx : txMap.get(accNo)) {
+                switch (tx.getType()) {
+                    case "입금" -> balance += tx.getAmount();
+                    case "출금", "이체" -> balance -= tx.getAmount();
+                }
+
+                System.out.printf("%-10s %-15s %-15s %-20s %10s\n",
+                        tx.getType(),
+                        MoneyUtil.formatWon(tx.getAmount()),
+                        MoneyUtil.formatWon((int)balance),
+                        tx.getT_date(),
+                        tx.getMemo() == null ? "null" : tx.getMemo());
+            }
+        }
+    }
 
     // ================================ 입·출금 , 이체 ================================ //
 

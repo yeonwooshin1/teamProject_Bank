@@ -15,7 +15,7 @@ public class AccountDao {
     // 계좌 유효성 검사 , 잔액 계산  , 거래내역 저장 , 계좌 번호로 계좌 로그번호 가져오는 dao
 
     // 싱글톤 생성
-    private AccountDao(){
+    public AccountDao(){
         connect();
     }
     private static final AccountDao instance = new AccountDao();
@@ -225,6 +225,7 @@ public class AccountDao {
 
             int result = ps.executeUpdate();
             if (result == 1) {
+                System.out.println("신규 계좌번호 : "+account_no+" 입니다.");
                 return true;
             } else {
                 return false;
@@ -254,6 +255,20 @@ public class AccountDao {
         return null;
     }
 
+    // 해지할 계좌 번호 일치 x
+    public boolean accountnoexists(String account_no) {
+        try{
+            String sql = "select 1 from account where account_no = ? ";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, account_no);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }catch (Exception e){
+            System.out.println("존재하지않음"+e);
+            return false;
+        }
+
+    }
 
 
     // 계좌 해지
@@ -304,9 +319,14 @@ public class AccountDao {
         }
     }
 
-    // 사용자 1 일경우
+
+
+
+    // 거래 내역 조회
+    // uno 기준으로 해당 사용자의 계좌번호 목록 반환
     public ArrayList<String> accountListUno(int uno) {
-        ArrayList<String> accountList = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
+
         try {
             String sql = "SELECT account_no FROM account WHERE uno = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -314,28 +334,30 @@ public class AccountDao {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                accountList.add(rs.getString("account_no"));
+                list.add(rs.getString("account_no"));
             }
         } catch (Exception e) {
-            System.out.println("회원 계좌 목록 조회 실패: " + e);
+            System.out.println("계좌 목록 조회 실패: " + e.getMessage());
         }
-        return accountList;
+
+        return list;
     }
 
-    // 거래 내역 조회
-    public ArrayList<AccountDto> accountList(String u_name) {
+    // 계좌번호로 거래내역 조회
+    public ArrayList<AccountDto> accountListByAccountNo(String accountNo) {
         ArrayList<AccountDto> list = new ArrayList<>();
 
-        try {
-            String sql = "SELECT t.tno, a.account_no, t.from_acno, t.to_acno, t.type, t.amount, t.memo, t.t_date " +
-                    "FROM transaction t " +
-                    "JOIN account a ON t.from_acno = a.acno OR t.to_acno = a.acno " +
-                    "JOIN user u ON a.uno = u.uno " +
-                    "WHERE u.u_name = ? " +
-                    "ORDER BY t.t_date DESC";
+        String sql = """
+            SELECT t.tno, a.account_no, t.from_acno, t.to_acno, 
+                   t.type, t.amount, t.memo, t.t_date 
+              FROM transaction t
+              JOIN account a ON t.from_acno = a.acno OR t.to_acno = a.acno
+             WHERE a.account_no = ?
+             ORDER BY t.t_date ASC
+        """;
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, u_name);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, accountNo);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -352,7 +374,7 @@ public class AccountDao {
                 list.add(dto);
             }
         } catch (Exception e) {
-            System.out.println("거래내역 조회 실패: " + e);
+            System.out.println("거래 내역 조회 실패: " + e.getMessage());
         }
 
         return list;
