@@ -13,7 +13,7 @@ public class OtpService {   // class start
 
     // 절대 변하지 않는 상수
     private static final Duration INPUT_UNTIL = Duration.ofMinutes(2); // 발급 후 입력시간 2분 제한
-    private static final Duration VALID_UNTIL = Duration.ofMinutes(1); // 성공 후 유효시간 2분 신뢰
+    private static final Duration VALID_UNTIL = Duration.ofMinutes(2); // 성공 후 유효시간 2분 신뢰
     private static final int MAX_ATTEMPTS = 3;                          // 실패 횟수 최대 3회
 
     // Otp 발급 상태 dto -> null 이면 발급 전/만료
