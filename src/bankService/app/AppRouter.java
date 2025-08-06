@@ -50,7 +50,7 @@ public final class AppRouter {  // class start
             // 앱 실행
             while (true) {
                 // ========== 1) 로그인 ==========
-                // wire 연결
+                // wire 연결 otp 랑 login
                 login.wire( scan ,reader, ioLock, otp);
                 OtpController.getInstance().wireOtp(otp);
 
