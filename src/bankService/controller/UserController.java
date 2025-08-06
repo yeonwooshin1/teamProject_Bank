@@ -90,7 +90,7 @@ public class UserController { // class start
         String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-\\[\\]{};':\"\\\\|,.<>/?]).{8,}$";
         if (!u_pwd1.matches(pwPattern)) {
             return -5;
-        }
+        }   // if end
 
         // 리스트 만들어서
         ArrayList<String> hostList = new ArrayList<>();
@@ -115,14 +115,14 @@ public class UserController { // class start
         } catch (DateTimeParseException e) {
             System.out.println("생년월일 형식 오류입니다");
             return -3;
-        }
+        }   // try end
 
         UserDto dto = new UserDto(u_id, u_pwd1, u_name, u_phone, u_email, birth); // ← birth
 
         int result = userDao.registerMember(dto);
 
         return result; // 1: 성공, -1: 중복, -3: DB오류
-    }
+    }   // func end
 
 
     // MemberController.java

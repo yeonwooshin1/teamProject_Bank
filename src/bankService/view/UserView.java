@@ -197,9 +197,9 @@ public class UserView { // class start
         String u_pwd2 = scan.next();
         System.out.print("이름 : ");
         String u_name = scan.next();
-        System.out.print("전화번호 : ");
+        System.out.print("전화번호 ( 010-xxxx-xxxx ) : ");
         String phone = scan.next();
-        System.out.print("이메일을 입력하세요 : ");
+        System.out.print("이메일을 입력하세요 ( gmail , naver , daum , kakao 중 하나 ) : ");
         String email = scan.next();
         // 형식 맞춰서 입력 받음
         System.out.print("생년월일(yyyy-MM-dd): ");
@@ -212,8 +212,8 @@ public class UserView { // class start
             case -2 -> System.out.println("❌ 입력하신 두 비밀번호가 일치하지 않습니다.");
             case -3 -> System.out.println("❌ 형식 오류가 발생했습니다.");
             case -4 -> System.out.println("❌ 이메일이 잘못 입력되었습니다.");
-            case -5 -> System.out.println( "❌ 비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다." );
-        }
+            case -5 -> System.out.println("❌ 비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다." );
+        }   // switch end
     } // func end
 
     //----------------------------------------------------------------------------------------------------//
