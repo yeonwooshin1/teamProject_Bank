@@ -165,6 +165,13 @@ public class UserController { // class start
 
     // 비밀번호 변경2
     public boolean update2Password(String u_id, String new_pwd) {
+        // 비밀번호 패턴 유효성 검사 (8자 이상, 영문+숫자+특수문자)
+        String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=\\-\\[\\]{};':\"\\\\|,.<>/?]).{8,}$";
+        if (!new_pwd.matches(pwPattern)) {
+            return false; // 유효성 실패 시 false 반환
+        }
+
+        // 기존 로직 그대로
         return userDao.update2Password(u_id, new_pwd);
     }
 
