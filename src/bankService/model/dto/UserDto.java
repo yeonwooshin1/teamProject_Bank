@@ -88,9 +88,11 @@ public class UserDto { // class start
 
     //getU_date()에서 LocalDate → java.sql.Date로 변환해서 DB저장 시 호환성.
     //setU_date(String u_date)는 String 입력받아 LocalDate로 파싱.
-    public java.sql.Date getU_date() {
-        return java.sql.Date.valueOf(this.u_date);  // LocalDate → sql.Date 변환
+
+    public LocalDate getU_date() {
+        return u_date;
     }
+
     public void setU_date(String u_date) {
         this.u_date = LocalDate.parse(u_date);
     }

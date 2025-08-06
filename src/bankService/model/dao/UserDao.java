@@ -7,6 +7,15 @@ import java.sql.*;
 
 public class UserDao { // class start
 
+    // 드라이버 로드 (최초 1회만 실행됨)
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("JDBC 3드라이버 로드 실패: " + e.getMessage());
+        }
+    }
+
     // 싱글톤
     private UserDao(){}
     private static final UserDao instance = new UserDao();
@@ -24,6 +33,8 @@ public class UserDao { // class start
     // 로그인
     public int login( UserDto dto ) {
 
+
+
         String sql = "SELECT uno FROM user WHERE u_id = ? AND u_pwd = ?";
 
         try {
@@ -39,11 +50,12 @@ public class UserDao { // class start
                 return uno;
             }
 
-        } catch (SQLException e) {
+        } catch ( Exception e) {
             System.out.println("SQLException 오류 발생 " + e.getMessage());
         }
 
         return 0; // 로그인 실패
+
     }
 
     //----------------------------------------------------------------------------------------------------//
@@ -77,13 +89,13 @@ public class UserDao { // class start
             ins.setString(4, dto.getU_phone());
             ins.setString(5, dto.getU_email());
             // java.time.LocalDate → java.sql.Date 로 변환
-            ins.setDate(6, dto.getU_date());
+            ins.setDate(6, Date.valueOf(dto.getU_date()));
 
 
             // 영향 받은 row 수(1 이면 성공) 리턴
             return ins.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return -3;  // DB 오류
         }
@@ -114,16 +126,17 @@ public class UserDao { // class start
         return null; // 못 찾으면 null 반환
     }
 
+//----------------------------------------------------------------------------------------------------//
 
     // 비밀번호찾기1
-    public int verifyAccount(String u_id, String u_phone) {
-        String sql = "SELECT COUNT(*) FROM user WHERE u_id = ? AND u_phone = ?";
+    public int verifyAccount(String u_id, String u_email) {
+        String sql = "SELECT COUNT(*) FROM user WHERE u_id = ? AND u_email = ?";
         try (
                 Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setString(1, u_id);
-            ps.setString(2, u_phone);
+            ps.setString(2, u_email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
                     return 1; // 사용자 정보 확인됨
@@ -135,6 +148,7 @@ public class UserDao { // class start
         return 0; // 계정 없음
     }
 
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호찾기2
     public int updatePassword(String u_id, String newPwd) {
@@ -152,6 +166,8 @@ public class UserDao { // class start
             return 0; // DB오류도 실패로 처리
         }
     }
+
+    //----------------------------------------------------------------------------------------------------//
 
     // 비밀번호 변경1
     public boolean verifyPassword(String u_id, String u_pwd) {
@@ -171,6 +187,8 @@ public class UserDao { // class start
         }
     }
 
+    //----------------------------------------------------------------------------------------------------//
+
     // 비밀번호 변경2
     public boolean update2Password(String u_id, String new_pwd) {
         String sql = "UPDATE user SET u_pwd = ? WHERE u_id = ?";
@@ -188,6 +206,8 @@ public class UserDao { // class start
         }
     }
 
+    //----------------------------------------------------------------------------------------------------//
+
 
     // 계정 탈퇴
     public boolean deleteAccount(String u_id, String u_pwd) {
@@ -201,11 +221,12 @@ public class UserDao { // class start
             int deleted = ps.executeUpdate();
             return deleted == 1; // 1명 삭제됐으면 true
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println( "계좌 잔액 있음");
             return false; // 예외 시 실패
         }
     }
 
+    // ghoon1210@gmail.com
 }
 
 

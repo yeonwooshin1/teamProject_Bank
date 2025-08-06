@@ -5,6 +5,14 @@ import java.util.HashMap;
 
 public class CustomerDao { // class start
 
+    // DB 연동 메소드 Class.forName("com.mysql.cj.jdbc.Driver");
+    private void connectDB () {
+        try{
+            // mysql 를 지정한 Driver 클래스 가져오기
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        }
+        catch ( ClassNotFoundException e ) { System.out.println("[실패] 1mysql 드라이버 연동 실패"); } // 클래스 있는지 잘 연결됐는지 예외
+    }   // func end
 
     // DB 연결 정보
     private static final String DB_URL = "jdbc:mysql://localhost:3306/bank";
