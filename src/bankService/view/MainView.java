@@ -382,6 +382,7 @@ public class MainView { // class start
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
+            // 일일 한도 넣어서 알림메시지 넣을 건지 , 거래 금액 너무 크면 경고 메시지 뜨고 새로 입력 받을 건지 정해서 추가 하면됨 .
         }   // if end
         return true;
     }   // func end
