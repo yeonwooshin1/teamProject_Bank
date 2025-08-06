@@ -2,6 +2,7 @@ package bankService.model.dao;
 
 import bankService.model.dto.IdResponseDto;
 import bankService.model.dto.UserDto;
+import com.mysql.cj.jdbc.ConnectionGroup;
 
 import java.sql.*;
 
@@ -74,7 +75,7 @@ public class UserDao { // class start
                 PreparedStatement chk = conn.prepareStatement(checkSql);
                 PreparedStatement ins = conn.prepareStatement(insertSql);
         ) {
-            // ─── 1) 중복 검사 ───────────────────────────────────────────────────────
+            // 중복 검사
             chk.setString(1, dto.getU_id());
             try (ResultSet rs = chk.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
@@ -82,13 +83,14 @@ public class UserDao { // class start
                 }
             }
 
-            // ─── 2) 실제 INSERT ────────────────────────────────────────────────────
+            // 실제 INSERT
             ins.setString(1, dto.getU_id());
             ins.setString(2, dto.getU_pwd());
             ins.setString(3, dto.getU_name());
             ins.setString(4, dto.getU_phone());
             ins.setString(5, dto.getU_email());
-            // java.time.LocalDate → java.sql.Date 로 변환
+            // dto.getU_date(): DTO에서 날짜(Date 타입 또는 String 타입) 값을 꺼냄
+            // Date.valueOf(): String(yyyy-MM-dd) → java.sql.Date 객체로 변환
             ins.setDate(6, Date.valueOf(dto.getU_date()));
 
 
@@ -96,7 +98,7 @@ public class UserDao { // class start
             return ins.executeUpdate();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println( "SQL 오류 발생 " + e );
             return -3;  // DB 오류
         }
     }
@@ -179,10 +181,11 @@ public class UserDao { // class start
             ps.setString(1, u_id);
             ps.setString(2, u_pwd);
             try (ResultSet rs = ps.executeQuery()) {
+                // rs.getInt(1): 첫 번째 컬럼의 값을 int로 가져옴
                 return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println( "SQLException 오류 발생 " + e);
             return false;
         }
     }
@@ -201,7 +204,7 @@ public class UserDao { // class start
             int updated = ps.executeUpdate();
             return updated == 1; // true: 변경 성공, false: 실패(아이디 틀림 등)
         } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
+            System.out.println( "SQLException 오류 발생 " + e);
             return false; // 예외도 실패 처리
         }
     }
@@ -210,22 +213,57 @@ public class UserDao { // class start
 
 
     // 계정 탈퇴
-    public boolean deleteAccount(String u_id, String u_pwd) {
-        String sql = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
-        try (
-                Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, u_id);
-            ps.setString(2, u_pwd);
-            int deleted = ps.executeUpdate();
-            return deleted == 1; // 1명 삭제됐으면 true
-        } catch (SQLException e) {
-            System.out.println( "SQLException 오류 발생" + e);
-            return false; // 예외 시 실패
-        }
-    }
 
+    // 합쳐보니까 SQL 외래키 무결성 오류때문에 계정 탈퇴가 안됨
+    // -> 부모 데이터를 지운다고 다 지워지는 게 아니고 자식 데이터부터 삭제해야함
+
+    //[ user ]
+    //  uno (PK)
+    //  u_id (아이디, unique)
+    //   ↓
+    //[ account ]
+    //  acno (PK)
+    //  uno (FK, user PK 참조)
+    //   ↓
+    //[ transaction ]
+    //  tno (PK)
+    //  from_acno (FK, account PK 참조)
+    //  to_acno (FK, account PK 참조)
+
+    public boolean deleteAccount(String u_id, String u_pwd) {
+        // 코드가 겹치니까 미리 위에다가 다 선언
+
+        // 먼저 입력한 아이디로 uno를 찾고나서 uno에 맞는 acno 찾고 해당되면 삭제
+        String sql0 = "DELETE FROM transaction WHERE from_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)) OR to_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?))";
+        String sql1 = "DELETE FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
+        String sql2 = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
+
+        // try 여러 개에 catch 하나 가능 괄호 처리
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            // 거래내역 삭제
+            // 쿼리문이 다르면 다 다르게 만들어야함
+            try (PreparedStatement ps0 = conn.prepareStatement(sql0)) {
+                ps0.setString(1, u_id);
+                ps0.setString(2, u_id);
+                ps0.executeUpdate();
+            }
+            // 계좌 삭제
+            try (PreparedStatement ps1 = conn.prepareStatement(sql1)) {
+                ps1.setString(1, u_id);
+                ps1.executeUpdate();
+            }
+            // 유저 삭제
+            try (PreparedStatement ps2 = conn.prepareStatement(sql2)) {
+                ps2.setString(1, u_id);
+                ps2.setString(2, u_pwd);
+                int deleted = ps2.executeUpdate();
+                return deleted == 1;
+            }
+        } catch (Exception e) {
+            System.out.println("SQL 오류 발생 " + e);
+        }
+        return false;
+    }
 }
 
 

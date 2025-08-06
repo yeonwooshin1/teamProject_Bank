@@ -8,6 +8,7 @@ import bankService.util.EmailValidationUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class UserController { // class start
 
 
     //싱글톤 가져오기
-    private UserDao userDao = UserDao.getInstance();
+    private final UserDao userDao = UserDao.getInstance();
 
     // wire 멤버변수
     OtpService otpService;
@@ -68,12 +69,28 @@ public class UserController { // class start
                               String u_name, String u_phone, String u_email, String u_date) {
         if (!u_pwd1.equals(u_pwd2)) return -2;
 
+        // 리스트 만들어서
+        ArrayList<String> hostList = new ArrayList<>();
+        hostList.add("gmail.com");
+        hostList.add("naver.com");
+        hostList.add("daum.net");
+        hostList.add("kakao.com");
+
+        String email = u_email.split("@")[1];
+        // indexOf와 contains 차이
+        // indexOf : 어떤 문자열(String)이나 리스트(List)에서 특정 요소가 어떤 위치(인덱스)에 존재하는지
+        // contains : 존재유무만 알고 싶을 때
+        if( ! hostList.contains(email) ) return -4;
+
+
+
         // ★ String → LocalDate 변환
+
         LocalDate birth;
         try {
             birth = LocalDate.parse(u_date); // "2025-07-31" 같은 형식
         } catch (DateTimeParseException e) {
-            System.out.println("생년월일 형식 오류");
+            System.out.println("생년월일 형식 오류입니다");
             return -3;
         }
 
