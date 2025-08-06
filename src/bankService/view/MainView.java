@@ -315,7 +315,7 @@ public class MainView { // class start
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 출금 >");
-        String account_no = readLine("출금할 계좌번호를 입력하세요. :");
+        String account_no = readLine("출금할 계좌번호를 입력하세요 :");
         String account_pwd = readLine("계좌 비밀번호 입력 :");
         int amount = readInt("출금할 금액 :");
 
