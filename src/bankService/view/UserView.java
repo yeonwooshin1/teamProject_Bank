@@ -83,9 +83,9 @@ public class UserView { // class start
 
     // 1. 로그인
     public int login() {
-        System.out.print("아이디를 입력해주세요 : ");
+        System.out.print("아이디를 입력해주세요( 소문자 입력 ) : ");
         String u_id = scan.next();
-        System.out.print("비밀번호를 입력해주세요 : ");
+        System.out.print("비밀번호를 입력해주세요( 소문자 입력 ) : ");
         String u_pwd = scan.next();
         int result = userController.login(u_id, u_pwd);
         if (result == -1) {
