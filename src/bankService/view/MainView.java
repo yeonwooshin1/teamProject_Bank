@@ -314,7 +314,7 @@ public class MainView { // class start
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             System.out.println("❌ 입금 실패!");
             System.out.println("에러 메시지 : " + resultDto.getMessage());
@@ -340,12 +340,12 @@ public class MainView { // class start
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
                 System.out.println("❌ 출금 실패!");
                 System.out.println("잔액 부족");
-                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+                System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             } else {
                 System.out.println("❌ 출금 실패!");
                 System.out.println("에러 메시지 : " + resultDto.getMessage());
@@ -374,11 +374,13 @@ public class MainView { // class start
 
         if (resultDto.isSuccess()) {
             System.out.println("✅ 이체 성공!");
+            System.out.println("메시지 : " + resultDto.getMessage());
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         } else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
                 System.out.println("❌ 이체 실패!");
                 System.out.println("잔액 부족");
-                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+                System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
         }   // if end
         return true;
