@@ -191,7 +191,7 @@ public class UserView { // class start
     public void register() {
         System.out.print("아이디를 입력하세요 : ");
         String u_id = scan.next();
-        System.out.print("비밀번호를 입력하세요 : ");
+        System.out.print("비밀번호를 입력하세요( 영어, 숫자, 특수문자 포함 8글자 ) : ");
         String u_pwd1 = scan.next();
         System.out.print("비밀번호 확인: ");
         String u_pwd2 = scan.next();
