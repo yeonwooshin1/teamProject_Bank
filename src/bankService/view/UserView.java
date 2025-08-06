@@ -11,6 +11,8 @@ import java.util.Scanner;
 import java.util.ServiceConfigurationError;
 
 
+
+
 // 유저와 직접적으로 소통하는 콘솔/화면 담당
 public class UserView { // class start
 
@@ -190,27 +192,28 @@ public class UserView { // class start
     // 2. 회원가입
     public void register() {
         System.out.print("아이디: ");
-        String u_id = scan.next();
+        String u_id = scan.next().toLowerCase();
         System.out.print("비밀번호: ");
-        String u_pwd1 = scan.next();
+        String u_pwd1 = scan.next().toLowerCase();
         System.out.print("비밀번호 확인: ");
-        String u_pwd2 = scan.next();
+        String u_pwd2 = scan.next().toLowerCase();
         System.out.print("이름: ");
-        String u_name = scan.next();
+        String u_name = scan.next().toLowerCase();
         System.out.print("전화번호: ");
-        String phone = scan.next();
+        String phone = scan.next().toLowerCase();
         System.out.print("이메일: ");
-        String email = scan.next();
+        String email = scan.next().toLowerCase();
         // 형식 맞춰서 입력 받음
         System.out.print("생년월일(yyyy-MM-dd): ");
         String u_date = scan.next();
         int result = userController.registerMember(u_id, u_pwd1, u_pwd2, u_name, phone, email, u_date);  // ← dto와 비번확인 함께 전달 // 비밀번호 확인까지 같이 전달
         // switch 문을 사용하면 result 값에 따라서 출력하는 메세지가 달라짐
         switch (result) {
-            case 1  -> System.out.println("회원가입 성공했습니다.");
-            case -1 -> System.out.println("중복된 아이디가 존재합니다.");
-            case -2 -> System.out.println("입력하신 두 비밀번호가 일치하지 않습니다.");
-            case -3 -> System.out.println("형식 오류가 발생했습니다.");
+            case 1  -> System.out.println("회원가입 성공했습니다." );
+            case -1 -> System.out.println("중복된 아이디가 존재합니다." );
+            case -2 -> System.out.println("입력하신 두 비밀번호가 일치하지 않습니다." );
+            case -3 -> System.out.println("형식 오류가 발생했습니다." );
+            case -4 -> System.out.println("이메일이 잘못 입력되었습니다." );
         }
     } // func end
 
