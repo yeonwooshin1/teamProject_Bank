@@ -51,7 +51,7 @@ public class UserView { // class start
                         "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
                         "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
                         "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
-                        " Made In - Gyeore , Jihoon , Yeonwoo , Yujin -");
+                        " Made by - Gyeore , Jihoon , Yeonwoo , Yujin -");
                 System.out.println("===================================================================");
                 System.out.println("[1] 로그인");
                 System.out.println("[2] 회원가입");
