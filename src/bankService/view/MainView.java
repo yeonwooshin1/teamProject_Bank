@@ -308,8 +308,18 @@ public class MainView { // class start
 
         if (!ensureAuthenticated()) return false;
 
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("입금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if(answer.equals("n")){
+                System.out.println("❌ 입금 취소!");
+                return false;
+            }
+        } // if e
+
         TransactionDto dto = new TransactionDto(account_no , account_pwd , amount);
         TransactionResultDto resultDto = accountController.deposit(dto);
+
 
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
@@ -335,10 +345,21 @@ public class MainView { // class start
 
         if (!ensureAuthenticated()) return false;
 
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("출금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if(answer.equals("n")){
+                System.out.println("❌ 출금 취소!");
+                return false;
+            }
+        } // if e
+
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
+
+
         if(resultDto.isSuccess()){
-            System.out.println("✅ 입금 성공!");
+            System.out.println("✅ 출금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
@@ -369,8 +390,19 @@ public class MainView { // class start
 
         if (!ensureAuthenticated()) return false;
 
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("거래금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if( answer.equals("n")){
+                System.out.println("❌ 이체 취소!");
+               return false;
+            }
+        } // if e
+
         TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
+
         TransferResultDto resultDto = accountController.transfer(dto);
+
 
         if (resultDto.isSuccess()) {
             System.out.println("✅ 이체 성공!");
@@ -381,6 +413,10 @@ public class MainView { // class start
                 System.out.println("❌ 이체 실패!");
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
+            }
+            if("같은 계좌로 이체할 수 없습니다.".equals(resultDto.getMessage())){
+                System.out.println("❌ 이체 실패!");
+                System.out.println("같은 계좌로 이체할 수 없습니다.");
             }
         }   // if end
         return true;
