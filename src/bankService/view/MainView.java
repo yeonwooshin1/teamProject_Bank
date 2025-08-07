@@ -110,7 +110,7 @@ public class MainView { // class start
     /** [남은 인증시간 프롬프트 꾸미기 */
     private String fullPromptWithTime(String prompt) {
         long sec = ctx.otp().getRemainingTrustSeconds();
-        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안❌ 재인증]";
+        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안 ⚠\uFE0F 재인증]";
         return prompt + msg + " ";
     }
 
@@ -156,7 +156,7 @@ public class MainView { // class start
             else if (choose == 4){ boolean ok = securitySettingsView(); if (!ok) return false; }
             else if (choose == 0){ return false;}
             else {
-                System.out.println("잘못된 입력입니다.");
+                System.out.println(" ⚠\uFE0F 잘못된 입력입니다.");
             }   // if end
         }   // while end
     }   // func end
@@ -189,7 +189,7 @@ public class MainView { // class start
         else if (choose == 3){ printMyTransactions(); }
         else if (choose == 4){ return true; }
         else {
-            System.out.println("잘못된 입력입니다.");
+            System.out.println(" ⚠\uFE0F 잘못된 입력입니다.");
         }   // if end
         return true;
     }   // func end
@@ -256,7 +256,7 @@ public class MainView { // class start
             System.out.println("해지 성공");
         }
         else {
-            System.out.println("해지 실패");
+            System.out.println(" ⚠\uFE0F 해지 실패");
         }
         return true;
     }
@@ -266,7 +266,7 @@ public class MainView { // class start
         Map<String, List<AccountDto>> txMap = accountController.getTransactionsByCurrentUser();
 
         if (txMap.isEmpty()) {
-            System.out.println("거래 내역이 없습니다.");
+            System.out.println(" ⚠\uFE0F 거래 내역이 없습니다.");
             return;
         }   // if end
 
@@ -368,12 +368,12 @@ public class MainView { // class start
         TransactionResultDto resultDto = accountController.deposit(dto);
 
         if(resultDto.isSuccess()){
-            System.out.println("✅ 입금 성공!");
+            System.out.println(" \uD83D\uDCB0 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
-            System.out.println("❌ 입금 실패!");
-            System.out.println("에러 메시지 : " + resultDto.getMessage());
+            System.out.println(" ⚠\uFE0F 입금 실패!");
+            System.out.println(" ⚠\uFE0F 에러 메시지 : " + resultDto.getMessage());
         }   // if end
         return true;
     }   // func end
@@ -407,11 +407,11 @@ public class MainView { // class start
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("❌ 출금 실패!");
-                System.out.println("잔액 부족");
+                System.out.println(" ⚠\uFE0F 출금 실패!");
+                System.out.println(" ⚠\uFE0F 잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             } else {
-                System.out.println("❌ 출금 실패!");
+                System.out.println(" ⚠\uFE0F 출금 실패!");
                 System.out.println("에러 메시지 : " + resultDto.getMessage());
             }   // if end
         }   // if end
@@ -450,7 +450,7 @@ public class MainView { // class start
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         } else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("❌ 이체 실패!");
+                System.out.println(" ⚠\uFE0F 이체 실패!");
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
@@ -486,7 +486,7 @@ public class MainView { // class start
                 case 1: changePassword(); break;
                 case 2: boolean deleted = deleteAccount(); if (!deleted) return false; break;
                 case 3: return true;
-                default: System.out.println("❌ 올바른 번호를 입력해주세요."); break;
+                default: System.out.println(" ⚠\uFE0F 올바른 번호를 입력해주세요."); break;
             }   // switch end
         }   // while end
     }   // func end
@@ -532,7 +532,7 @@ public class MainView { // class start
             return false; // 바로 로그아웃(메인뷰 빠져나감)
         }
         else {
-            System.out.println("탈퇴 실패했습니다.");
+            System.out.println(" ⚠\uFE0F 탈퇴 실패했습니다.");
             return true; // 계속 남음
         }   // if end
     }   // func end
@@ -548,14 +548,14 @@ public class MainView { // class start
         if (otpController.trustOtp()) return true;
 
         while (true) {
-            String ans = readLine("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? ( Y / N ): ").toLowerCase();
+            String ans = readLine(" ⚠\uFE0F 보안 세션이 만료되었습니다. 인증하시겠습니까? ( Y / N ): ").toLowerCase();
 
             if (ans.equals("y")) {
                 OtpView.getInstance().forceReauth();
                 return otpController.trustOtp();
             }
             else if (ans.equals("n")) {
-                String ansRe = readLine("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? ( Y / N ): ").toLowerCase();
+                String ansRe = readLine(" ⚠\uFE0F 미인증시 로그아웃 됩니다. 인증 하시겠습니까? ( Y / N ): ").toLowerCase();
 
                 if (ansRe.equals("y")) {
                     OtpView.getInstance().forceReauth();
