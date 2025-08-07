@@ -101,5 +101,11 @@ public class EmailService { // class start
         String html    = EmailSendFormat.bodyHtmlLogin(otp);
         sendHtml(to, subject, html);
     }   // func end
+
+    public void sendOtpHtmlLockLogin(String to, String otp) throws MessagingException{
+        String subject = EmailSendFormat.subjectLockLogin();
+        String html    = EmailSendFormat.bodyHtmlLockLogin(otp);
+        sendHtml(to, subject, html);
+    }
 }   // class end
 

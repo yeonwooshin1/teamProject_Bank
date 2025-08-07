@@ -51,7 +51,7 @@ public class UserView { // class start
                         "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
                         "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
                         "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
-                        "                                                                 ");
+                        " Made In - Gyeore , Jihoon , Yeonwoo , Yujin -");
                 System.out.println("===================================================================");
                 System.out.println("[1] 로그인");
                 System.out.println("[2] 회원가입");
@@ -93,15 +93,16 @@ public class UserView { // class start
         System.out.print("비밀번호를 입력해주세요( 소문자 입력 ) : ");
         String u_pwd = scan.next();
         int result = userController.login(u_id, u_pwd);
-        if (result == -1) {
-            System.out.println("⚠\uFE0F 로그인 5회 시도했습니다.");
-            return result;
+        if (result < 0) {
+             boolean errorResult = loginError(result);
+             // loginFailMap 초기화 메소드
+             if(errorResult) userController.resetLoginFailMap(u_id);
+             return 0;
         }
         else if (result == 0) {
             System.out.println("⚠\uFE0F 로그인 실패했습니다.");
             return result;
         }
-
         if (otpRequiredPromptLogin()) {
             boolean success = handleOtpProcess(result);
             return success ? result : 0;
@@ -111,6 +112,31 @@ public class UserView { // class start
         }   // if end
     }   // func end
 
+
+    // 로그인 5회 실패 했는데 로그인시 출력 메소드
+    private boolean loginError(int uno){
+        while (true) {
+            System.out.println("\uD83D\uDD10 로그인 5회 실패로 인하여 계정이 일시적으로 잠금되었습니다.");
+            try{ Thread.sleep(300); } catch (Exception e) {}
+            System.out.println("\uD83D\uDD10 계정 보호를 위해 OTP 인증이 필요합니다. 인증 받으시겟습니까?");
+            System.out.print(" Y / N 중에 선택하세요. ");      String otpOk = scan.next();
+            if ("Y".equalsIgnoreCase(otpOk)) {
+                // 음수유저값이니까 -값 준다.
+                String getEmail = otpController.findEmail(-uno);
+
+                boolean result = handleOtpProcess(getEmail , 3);
+                // 실패했는지 성공했는지 값 반환
+                if(result) System.out.println("✅ 계정잠금이 풀렸습니다. 재로그인시 저희 서비스 이용이 가능합니다.");
+                return result;
+            }
+            else if ("N".equalsIgnoreCase(otpOk)) {
+                System.out.println("\uD83D\uDD10미인증시 로그인 화면으로 이동합니다.");
+                return false;
+            }
+            else System.out.println("Y 또는 N 중에 선택해주세요.");
+        }   // while end
+    } // func end
+
     // 로그인시 otp 발급 여부 묻기 메소드
     private boolean otpRequiredPromptLogin() {
         while (true) {
@@ -118,7 +144,9 @@ public class UserView { // class start
             System.out.print(" Y / N 중에 선택하세요. ");
             String choose = scan.next();
 
-            if ("Y".equalsIgnoreCase(choose)) return true;
+            if ("Y".equalsIgnoreCase(choose)) {
+                return true;
+            }
             else if ("N".equalsIgnoreCase(choose)) return false;
             else System.out.println("Y 또는 N 중에 선택해주세요.");
         }   // while end
@@ -135,8 +163,9 @@ public class UserView { // class start
     // otp 발급 (로그인 1, 비밀번호찾기 2)
     public boolean handleOtpProcess(String email , int value){
         while (true) {
-            if (value == 1) otpController.getIssueLogin(email);
-            else if (value == 2) otpController.getIssuePW(email);
+            if (value == 1) otpController.getIssue(email , 1);
+            else if (value == 2) otpController.getIssue(email ,2);
+            else if (value == 3 ) otpController.getIssue(email , 3);
             System.out.println(" \uD83D\uDCE9 등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
 
             boolean verified = handleOtpInput();

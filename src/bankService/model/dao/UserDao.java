@@ -31,6 +31,29 @@ public class UserDao { // class start
     private static final String DB_PASSWORD = "1234";
     UserDto dto = new UserDto();
 
+    // 로그인 5회 실패시 유저 아이디에 있는 유저번호 가져오기
+    public int getUno (String u_id) {
+        String sql = "select uno from user where u_id = ?";
+
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+
+            preparedStatement.setString(1, u_id);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                int uno = rs.getInt( "uno");
+                return uno;    // 유저값 주기
+            }
+
+        } catch ( Exception e) {
+            System.out.println("SQLException 오류 발생 " + e.getMessage());
+        }
+
+        return -999999999;  // 없는 유저
+    }
+
     // 로그인
     public int login( UserDto dto ) {
 
