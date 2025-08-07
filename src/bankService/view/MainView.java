@@ -49,6 +49,7 @@ public class MainView { // class start
         this.ctx  = ctx;
         this.ioLock = ctx.ioLock();
         this.reader = ctx.reader(); // LineReader로 변경
+        statusBar = "";          // ★ 이전 세션 메시지 초기화
     }   // wire end
 
 
@@ -80,20 +81,26 @@ public class MainView { // class start
     /* MainView.java */
     public void showNoticeAndClearBuffer(String msg) {
         synchronized (ioLock) {
-            /* 1) 현재 편집 줄 백업 */
-            String bufLine = reader.getBuffer().toString();
 
-            /* 2) 줄 전체 삭제 */
-            reader.getTerminal().writer().print("\033[2K\r");
-            reader.getTerminal().flush();
+            /* 1) 현재 입력 줄 백업 */
+            String bufLine = reader.getBuffer().toString();
+            String prompt  = currentPrompt;          // 우리가 마지막에 넣어둔 프롬프트
+
+            /* 2) 줄 삭제 */
+            var term = reader.getTerminal();
+            term.writer().print("\033[2K\r");        // ESC[2K + CR
+            term.flush();
             reader.getBuffer().clear();
 
-            /* 3) 알림 한 줄 출력 (JLine이 바로 프롬프트+입력 재그리기) */
+            /* 3) 알림 출력 (printAbove 가 프롬프트•입력 자동 재그리기) */
             reader.printAbove(msg);
 
-            /* 4) 버퍼만 복원 → REDRAW_LINE 호출로 한 번 더 정확히 그리기 */
+            /* 4) 입력 내용만 다시 덮어씀 (프롬프트는 이미 있음) */
+            term.writer().print(bufLine);
+            term.flush();
+
+            /* 5) 버퍼 복원 → 편집 계속 가능 */
             reader.getBuffer().write(bufLine);
-            reader.callWidget(org.jline.reader.LineReader.REDRAW_LINE);
         }
     }
 
@@ -146,8 +153,9 @@ public class MainView { // class start
     public void stopOtpThread() {
         if (otpTimerThread != null && otpTimerThread.isAlive()) {
             otpTimerThread.interrupt();
-        }
-    }
+        }   // if end
+        statusBar = "";          // ★ 이전 세션 메시지 초기화
+    }   // func end
 
     // ========== 이하 모든 readInt/readLine을 위 유틸로만 사용! ==========
 
