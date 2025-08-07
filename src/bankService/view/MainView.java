@@ -134,6 +134,12 @@ public class MainView { // class start
         }
 
         while (true){
+            // 1) 보안 세션 확인/재인증
+            if (!ensureAuthenticated()) {
+                return false;
+            }   // if end
+
+            // 2) 메뉴 출력
             System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
             System.out.println("┃                 BB  BANK               ┃");
             System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
