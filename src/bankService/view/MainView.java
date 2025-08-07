@@ -356,7 +356,7 @@ public class MainView { // class start
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
         if(resultDto.isSuccess()){
-            System.out.println("✅ 입금 성공!");
+            System.out.println("✅ 출금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
