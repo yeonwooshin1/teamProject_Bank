@@ -61,6 +61,7 @@ public class AccountController {
         // 잔액 확인 및 잔액 업데이트
         int balance = accountDao.isBalance(to_acno);
 
+
         // 성공/실패 여부
         return new TransactionResultDto(true, "입금이 완료되었습니다." , balance );
 
@@ -90,6 +91,7 @@ public class AccountController {
         if (balance < amount ){
             return new TransactionResultDto(false , "잔액이 부족합니다." , balance);
         } // if e
+
 
         // 거래내역 저장
         boolean isSaved = accountDao.saveTransaction(from_acno , 1001 , amount , null , "출금");
@@ -135,12 +137,12 @@ public class AccountController {
             return new TransferResultDto(false , "계좌번호로 이체받을 계좌 정보를 찾을 수 없습니다." , -1);
         } // if e
 
+
         // 잔액 확인 및 잔액 업데이트
         int balance = accountDao.isBalance(from_acno);      // 이체할 계좌 잔액 계산 후 저장
         if(balance < amount){
             return new TransferResultDto(false , "잔액이 부족합니다." , balance);
         } // if e
-
 
         // 같은 계좌에서 이체 불가
         if (from_acno == to_acno) {
@@ -152,6 +154,8 @@ public class AccountController {
         if(!isSaved){
             return new TransferResultDto(false , "이체 실패 : 거래 내역 저장 중 오류 발생 " , -1);
         } // if e
+
+
 
         // 성공/실패 여부
         int updateBalance = accountDao.isBalance(from_acno);
