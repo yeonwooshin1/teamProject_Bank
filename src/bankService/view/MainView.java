@@ -110,7 +110,7 @@ public class MainView { // class start
     /** [남은 인증시간 프롬프트 꾸미기 */
     private String fullPromptWithTime(String prompt) {
         long sec = ctx.otp().getRemainingTrustSeconds();
-        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안❌ 재인증]";
+        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안 ⚠\uFE0F 재인증]";
         return prompt + msg + " ";
     }
 
@@ -133,14 +133,22 @@ public class MainView { // class start
             }   // if end
 
             // 2) 메뉴 출력
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+            System.out.println("===================================================================\n");
+            System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                    "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                    "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                    "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                    "                                                                 ");
+            System.out.println("===================================================================");
             System.out.println("[1] 계좌관리  [2] 입·출금  [3] 계좌이체");
             System.out.println("[4] 보안설정  [0] 로그아웃");
             int choose = readInt("선택 ➜ ");
 
-            System.out.println("==========================================");
+            System.out.println("===================================================================");
 
             if(choose == 1){ boolean ok = account(); if (!ok) return false; }
             else if (choose == 2){  boolean ok = transation(); if (!ok) return false; }
@@ -148,7 +156,7 @@ public class MainView { // class start
             else if (choose == 4){ boolean ok = securitySettingsView(); if (!ok) return false; }
             else if (choose == 0){ return false;}
             else {
-                System.out.println("잘못된 입력입니다.");
+                System.out.println(" ⚠\uFE0F 잘못된 입력입니다.");
             }   // if end
         }   // while end
     }   // func end
@@ -158,22 +166,30 @@ public class MainView { // class start
     // 계좌 통합 view
     public boolean account(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("[1] 새 계좌 개설");
         System.out.println("[2] 계좌 해지");
         System.out.println("[3] 내 계좌 목록");
         System.out.println("[4] 뒤로");
         int choose = readInt("선택 ➜ ");
-        System.out.println("==========================================");
+        System.out.println("===================================================================");
 
         if(choose ==1 ){ accountAdd(); }
         else if (choose == 2 ){ accountDel(); }
         else if (choose == 3){ printMyTransactions(); }
         else if (choose == 4){ return true; }
         else {
-            System.out.println("잘못된 입력입니다.");
+            System.out.println(" ⚠\uFE0F 잘못된 입력입니다.");
         }   // if end
         return true;
     }   // func end
@@ -181,9 +197,17 @@ public class MainView { // class start
     // 계좌 생성 view
     public boolean accountAdd() {
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("< 새 계좌 개설 >");
 
         String account_pwd;
@@ -209,9 +233,17 @@ public class MainView { // class start
     // 계좌 해지 view
     public boolean accountDel(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("< 계좌 해지 >");
         String account_no = readLine("해지할 계좌 번호 : ");
         String account_pwd = readLine("계좌 비밀 번호 : ");
@@ -224,7 +256,7 @@ public class MainView { // class start
             System.out.println("해지 성공");
         }
         else {
-            System.out.println("해지 실패");
+            System.out.println(" ⚠\uFE0F 해지 실패");
         }
         return true;
     }
@@ -234,7 +266,7 @@ public class MainView { // class start
         Map<String, List<AccountDto>> txMap = accountController.getTransactionsByCurrentUser();
 
         if (txMap.isEmpty()) {
-            System.out.println("거래 내역이 없습니다.");
+            System.out.println(" ⚠\uFE0F 거래 내역이 없습니다.");
             return;
         }   // if end
 
@@ -264,14 +296,22 @@ public class MainView { // class start
     // 입출금 view
     public boolean transation(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("[1] 입금");
         System.out.println("[2] 출금");
         System.out.println("[3] 뒤로");
         int choose = readInt("선택 ➜ ");
-        System.out.println("==========================================");
+        System.out.println("===================================================================");
 
         if(choose == 1){ deposit(); }
         else if (choose == 2) { withdraw(); }
@@ -282,13 +322,21 @@ public class MainView { // class start
     // 이체 view
     public boolean transferView(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("[1] 이체");
         System.out.println("[2] 뒤로");
         int choose = readInt("선택 ➜ ");
-        System.out.println("==========================================");
+        System.out.println("===================================================================");
 
         if(choose ==1 ){ transfer(); }
         else if (choose ==2) { return true; }
@@ -298,9 +346,17 @@ public class MainView { // class start
     // 입금 view
     public boolean deposit(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("< 입금 >");
         String account_no = readLine("입금할 계좌 : ");
         String account_pwd = readLine("계좌 비밀번호 : ");
@@ -312,12 +368,12 @@ public class MainView { // class start
         TransactionResultDto resultDto = accountController.deposit(dto);
 
         if(resultDto.isSuccess()){
-            System.out.println("✅ 입금 성공!");
+            System.out.println(" \uD83D\uDCB0 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
-            System.out.println("❌ 입금 실패!");
-            System.out.println("에러 메시지 : " + resultDto.getMessage());
+            System.out.println(" ⚠\uFE0F 입금 실패!");
+            System.out.println(" ⚠\uFE0F 에러 메시지 : " + resultDto.getMessage());
         }   // if end
         return true;
     }   // func end
@@ -325,9 +381,17 @@ public class MainView { // class start
     // 출금 view
     public boolean withdraw(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("< 출금 >");
         String account_no = readLine("출금할 계좌번호를 입력하세요 : ");
         String account_pwd = readLine("계좌 비밀번호 입력 : ");
@@ -343,11 +407,11 @@ public class MainView { // class start
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("❌ 출금 실패!");
-                System.out.println("잔액 부족");
+                System.out.println(" ⚠\uFE0F 출금 실패!");
+                System.out.println(" ⚠\uFE0F 잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             } else {
-                System.out.println("❌ 출금 실패!");
+                System.out.println(" ⚠\uFE0F 출금 실패!");
                 System.out.println("에러 메시지 : " + resultDto.getMessage());
             }   // if end
         }   // if end
@@ -357,9 +421,17 @@ public class MainView { // class start
     // 이체 view
     public boolean transfer() {
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                 BB  BANK               ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("===================================================================\n");
+        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                "                                                                 ");
+        System.out.println("===================================================================");
         System.out.println("< 이체 >");
         String sender_no = readLine("이체할 계좌 : ");
         String receiver_no = readLine("이체받는 계좌 : ");
@@ -378,7 +450,7 @@ public class MainView { // class start
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         } else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("❌ 이체 실패!");
+                System.out.println(" ⚠\uFE0F 이체 실패!");
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
@@ -392,21 +464,29 @@ public class MainView { // class start
     public boolean securitySettingsView() {
         while (true) {
             if (!ensureAuthenticated()) return false;
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                 BB  BANK               ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+            System.out.println("===================================================================\n");
+            System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                    "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                    "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                    "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                    "                                                                 ");
+            System.out.println("===================================================================");
             System.out.println("< 보안 설정 >");
             System.out.println("[1] 비밀번호 변경");
             System.out.println("[2] 회원 탈퇴");
             System.out.println("[3] 뒤로");
             int choose = readInt("선택 ➜ ");
-            System.out.println("==========================================");
+            System.out.println("===================================================================");
 
             switch (choose) {
                 case 1: changePassword(); break;
                 case 2: boolean deleted = deleteAccount(); if (!deleted) return false; break;
                 case 3: return true;
-                default: System.out.println("❌ 올바른 번호를 입력해주세요."); break;
+                default: System.out.println(" ⚠\uFE0F 올바른 번호를 입력해주세요."); break;
             }   // switch end
         }   // while end
     }   // func end
@@ -452,7 +532,7 @@ public class MainView { // class start
             return false; // 바로 로그아웃(메인뷰 빠져나감)
         }
         else {
-            System.out.println("탈퇴 실패했습니다.");
+            System.out.println(" ⚠\uFE0F 탈퇴 실패했습니다.");
             return true; // 계속 남음
         }   // if end
     }   // func end
@@ -468,14 +548,14 @@ public class MainView { // class start
         if (otpController.trustOtp()) return true;
 
         while (true) {
-            String ans = readLine("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? ( Y / N ): ").toLowerCase();
+            String ans = readLine(" ⚠\uFE0F 보안 세션이 만료되었습니다. 인증하시겠습니까? ( Y / N ): ").toLowerCase();
 
             if (ans.equals("y")) {
                 OtpView.getInstance().forceReauth();
                 return otpController.trustOtp();
             }
             else if (ans.equals("n")) {
-                String ansRe = readLine("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? ( Y / N ): ").toLowerCase();
+                String ansRe = readLine(" ⚠\uFE0F 미인증시 로그아웃 됩니다. 인증 하시겠습니까? ( Y / N ): ").toLowerCase();
 
                 if (ansRe.equals("y")) {
                     OtpView.getInstance().forceReauth();
