@@ -355,6 +355,9 @@ public class MainView { // class start
     // 입금 view
     public boolean deposit(){
         if (!ensureAuthenticated()) return false;
+
+
+
         System.out.println("===================================================================\n");
         System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
                 "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
