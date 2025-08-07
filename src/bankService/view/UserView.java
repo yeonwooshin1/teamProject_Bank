@@ -114,7 +114,7 @@ public class UserView { // class start
     // 로그인시 otp 발급 여부 묻기 메소드
     private boolean otpRequiredPromptLogin() {
         while (true) {
-            System.out.println(" \uD83D\uDCE9 안전한 서비스 이용을 위해 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
+            System.out.println("\uD83D\uDCE9 안전한 서비스 이용을 위해 로그인 시 OTP 인증이 필요합니다. 인증 받으시겠습니까?");
             System.out.print(" Y / N 중에 선택하세요. ");
             String choose = scan.next();
 
@@ -137,7 +137,7 @@ public class UserView { // class start
         while (true) {
             if (value == 1) otpController.getIssueLogin(email);
             else if (value == 2) otpController.getIssuePW(email);
-            System.out.println(" \uD83D\uDCE9 등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
+            System.out.println("\uD83D\uDCE9 등록된 이메일로 인증 OTP를 발송했습니다. 메일 수신함을 확인해 주세요.");
 
             boolean verified = handleOtpInput();
             if (verified) return true;
@@ -178,7 +178,7 @@ public class UserView { // class start
                     System.out.println("⚠\uFE0F OTP가 일치하지 않습니다. 다시 시도해주세요.");
                 }
                 case 5 -> {
-                    System.out.println(" OTP 인증이 성공적으로 완료되었습니다.");
+                    System.out.println("\uD83D\uDCB5 OTP 인증이 성공적으로 완료되었습니다.");
                     return true;
                 }
                 default -> {
@@ -212,7 +212,7 @@ public class UserView { // class start
         int result = userController.registerMember(u_id, u_pwd1, u_pwd2, u_name, phone, email, u_date);  // ← dto와 비번확인 함께 전달 // 비밀번호 확인까지 같이 전달
         // switch 문을 사용하면 result 값에 따라서 출력하는 메세지가 달라짐
         switch (result) {
-            case 1  -> System.out.println("✅ 회원가입 성공했습니다. ");
+            case 1  -> System.out.println("\uD83D\uDCB5 회원가입 성공했습니다. ");
             case -1 -> System.out.println("⚠\uFE0F 중복된 아이디가 존재합니다.");
             case -2 -> System.out.println("⚠\uFE0F 입력하신 두 비밀번호가 일치하지 않습니다.");
             case -3 -> System.out.println("⚠\uFE0F 형식 오류가 발생했습니다.");
@@ -258,7 +258,7 @@ public class UserView { // class start
             int result = userController.updatePassword(u_id, newPwd);
             // if 안에 if
             if (result == 1)
-                System.out.println("✅ 비밀번호 변경이 완료되었습니다.");
+                System.out.println("\uD83D\uDCB5 비밀번호 변경이 완료되었습니다.");
             else
                 System.out.println("⚠\uFE0F 비밀번호 변경에 실패했습니다.");
         } else {
