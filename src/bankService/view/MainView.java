@@ -80,6 +80,7 @@ public class MainView { // class start
         }
     }
 
+
     // ================== LineReader + 상태바 입력 유틸 ==================
 
     private int readInt(String prompt) {
@@ -112,6 +113,12 @@ public class MainView { // class start
         long sec = ctx.otp().getRemainingTrustSeconds();
         String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안 ⚠\uFE0F 재인증]";
         return prompt + msg + " ";
+    }
+    // 로그아웃시 스레드 종료
+    public void stopOtpThread() {
+        if (otpTimerThread != null && otpTimerThread.isAlive()) {
+            otpTimerThread.interrupt();
+        }
     }
 
     // ========== 이하 모든 readInt/readLine을 위 유틸로만 사용! ==========
@@ -184,8 +191,8 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("===================================================================");
 
-        if(choose ==1 ){ accountAdd(); }
-        else if (choose == 2 ){ accountDel(); }
+        if(choose ==1 ){ return accountAdd(); }
+        else if (choose == 2 ){ return accountDel(); }
         else if (choose == 3){ printMyTransactions(); }
         else if (choose == 4){ return true; }
         else {
@@ -261,6 +268,8 @@ public class MainView { // class start
         return true;
     }
 
+
+
     // 계좌 목록 view
     public void printMyTransactions() {
         Map<String, List<AccountDto>> txMap = accountController.getTransactionsByCurrentUser();
@@ -313,8 +322,8 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("===================================================================");
 
-        if(choose == 1){ deposit(); }
-        else if (choose == 2) { withdraw(); }
+        if(choose == 1){ return deposit(); }
+        else if (choose == 2) { return withdraw(); }
         else if (choose == 3) { return true; }
         return true;
     }   // func end
@@ -338,7 +347,7 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("===================================================================");
 
-        if(choose ==1 ){ transfer(); }
+        if(choose ==1 ){ return transfer(); }
         else if (choose ==2) { return true; }
         return true;
     }   // func end
@@ -363,6 +372,15 @@ public class MainView { // class start
         int amount = readInt("입금할 금액 : ");
 
         if (!ensureAuthenticated()) return false;
+
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("입금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if(answer.equals("n")){
+                System.out.println("❌ 입금 취소!");
+                return false;
+            }
+        } // if e
 
         TransactionDto dto = new TransactionDto(account_no , account_pwd , amount);
         TransactionResultDto resultDto = accountController.deposit(dto);
@@ -399,10 +417,19 @@ public class MainView { // class start
 
         if (!ensureAuthenticated()) return false;
 
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("출금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if(answer.equals("n")){
+                System.out.println("❌ 출금 취소!");
+                return false;
+            }
+        } // if e
+
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
         if(resultDto.isSuccess()){
-            System.out.println("✅ 입금 성공!");
+            System.out.println("✅ 출금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
@@ -441,6 +468,15 @@ public class MainView { // class start
 
         if (!ensureAuthenticated()) return false;
 
+        // 거래 금액 100만원 이상일 시 응답받기
+        if(amount >= 1000000 ){
+            String answer = readLine("거래금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            if( answer.equals("n")){
+                System.out.println("❌ 이체 취소!");
+               return false;
+            }
+        } // if e
+
         TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
         TransferResultDto resultDto = accountController.transfer(dto);
 
@@ -454,6 +490,13 @@ public class MainView { // class start
                 System.out.println("잔액 부족");
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
+            if("같은 계좌로 이체할 수 없습니다.".equals(resultDto.getMessage())){
+                System.out.println("❌ 이체 실패!");
+                System.out.println("같은 계좌로 이체할 수 없습니다.");
+            }
+
+
+
         }   // if end
         return true;
     }   // func end
