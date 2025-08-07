@@ -375,9 +375,9 @@ public class MainView { // class start
 
         // 거래 금액 100만원 이상일 시 응답받기
         if(amount >= 1000000 ){
-            String answer = readLine("입금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+            String answer = readLine(" ⚠\uFE0F 입금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
             if(answer.equals("n")){
-                System.out.println("❌ 입금 취소!");
+                System.out.println("⚠\uFE0F 입금 취소!");
                 return false;
             }
         } // if e
@@ -386,7 +386,7 @@ public class MainView { // class start
         TransactionResultDto resultDto = accountController.deposit(dto);
 
         if(resultDto.isSuccess()){
-            System.out.println(" \uD83D\uDCB0 입금 성공!");
+            System.out.println(" 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
@@ -421,7 +421,7 @@ public class MainView { // class start
         if(amount >= 1000000 ){
             String answer = readLine("출금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
             if(answer.equals("n")){
-                System.out.println("❌ 출금 취소!");
+                System.out.println(" ⚠\uFE0F 출금 취소!");
                 return false;
             }
         } // if e
@@ -472,7 +472,7 @@ public class MainView { // class start
         if(amount >= 1000000 ){
             String answer = readLine("거래금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
             if( answer.equals("n")){
-                System.out.println("❌ 이체 취소!");
+                System.out.println("⚠\uFE0F 이체 취소!");
                return false;
             }
         } // if e
@@ -491,8 +491,8 @@ public class MainView { // class start
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
             if("같은 계좌로 이체할 수 없습니다.".equals(resultDto.getMessage())){
-                System.out.println("❌ 이체 실패!");
-                System.out.println("같은 계좌로 이체할 수 없습니다.");
+                System.out.println(" ⚠\uFE0F 이체 실패!");
+                System.out.println(" ⚠\uFE0F같은 계좌로 이체할 수 없습니다.");
             }
 
 
@@ -552,9 +552,9 @@ public class MainView { // class start
 
             boolean result = userController.update2Password(u_id, newPwd);
             if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-            else  System.out.println("비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
+            else  System.out.println(" ⚠\uFE0F 비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
         } else {
-            System.out.println("비밀번호가 일치하지 않습니다.");
+            System.out.println(" ⚠\uFE0F 비밀번호가 일치하지 않습니다.");
         }   // if end
         return true;
     }   // func end
@@ -608,7 +608,7 @@ public class MainView { // class start
                     return false;
                 }   // if end
             }   // if end
-            else System.out.println("y , n 중 하나만 입력하세요.");
+            else System.out.println(" ⚠\uFE0F y , n 중 하나만 입력하세요.");
         }   // while end
     }   // func end
 }   // class end
