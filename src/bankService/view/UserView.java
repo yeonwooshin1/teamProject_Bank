@@ -42,6 +42,7 @@ public class UserView { // class start
     public int index() {
         synchronized (ioLock) {
             try {
+                System.out.println("===================================================================\n");
                 System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
                         "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
                         "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
@@ -51,6 +52,7 @@ public class UserView { // class start
                         "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
                         "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
                         "                                                                 ");
+                System.out.println("===================================================================");
                 System.out.println("[1] 로그인");
                 System.out.println("[2] 회원가입");
                 System.out.println("[3] 아이디 찾기");
@@ -58,7 +60,7 @@ public class UserView { // class start
                 System.out.println("[0] 종료 ");
                 System.out.print("선택 ➜ ");
                 int choose = scan.nextInt();
-                System.out.println("==========================================");
+                System.out.println("===================================================================");
 
                 if (choose == 1) {
                     int result = login();
