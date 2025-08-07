@@ -229,7 +229,7 @@ public class MainView { // class start
         boolean result = accountController.accountAdd(account_pwd);
 
         if (result) {
-            System.out.println("계좌가 개설되었습니다.");
+            System.out.println("\uD83C\uDFE6➕계좌가 개설되었습니다.");
         } else {
             System.out.println("계좌 개설 실패");
         }   // if end
@@ -260,7 +260,7 @@ public class MainView { // class start
         boolean result = accountController.accountDel(account_no , account_pwd);
 
         if(result){
-            System.out.println("해지 성공");
+            System.out.println("\uD83C\uDFE6✂\uFE0F해지 성공");
         }
         else {
             System.out.println(" ⚠\uFE0F 해지 실패");
@@ -281,7 +281,7 @@ public class MainView { // class start
 
         for (String accNo : txMap.keySet()) {
             System.out.println("\n계좌번호: " + accNo);
-            System.out.printf("%-10s %-15s %-15s %-20s %-10s\n", "거래유형", "금액", "잔액", "거래일자", "메모");
+            System.out.printf("%-10s %-15s %-15s %-20s %-10s\n", "📊"+ "거래유형", "금액", "잔액", "거래일자", "메모");
 
             long balance = 0;
             for (AccountDto tx : txMap.get(accNo)) {
@@ -429,7 +429,7 @@ public class MainView { // class start
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
         if(resultDto.isSuccess()){
-            System.out.println("✅ 출금 성공!");
+            System.out.println("\uD83D\uDCB5 출금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
@@ -481,7 +481,7 @@ public class MainView { // class start
         TransferResultDto resultDto = accountController.transfer(dto);
 
         if (resultDto.isSuccess()) {
-            System.out.println("✅ 이체 성공!");
+            System.out.println("\uD83D\uDCB8 이체 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         } else {
