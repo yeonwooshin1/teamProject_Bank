@@ -49,7 +49,6 @@ public class UserView { // class start
                 System.out.println("[2] 회원가입");
                 System.out.println("[3] 아이디 찾기");
                 System.out.println("[4] 비밀번호 찾기");
-                System.out.println("[0] 종료 ");
                 System.out.print("선택 ➜ ");
                 int choose = scan.nextInt();
                 System.out.println("==========================================");
@@ -66,8 +65,6 @@ public class UserView { // class start
                 } else if (choose == 4) {
                     findPassword();
                     return 0;
-                } else if (choose == 0) {
-                    return -1;
                 }
                 else {
                     System.out.println("[경고] 메뉴에 있는 숫자를 입력해주세요.");

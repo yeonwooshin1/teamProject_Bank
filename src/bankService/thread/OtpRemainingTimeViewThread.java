@@ -2,6 +2,7 @@ package bankService.thread;
 
 import bankService.service.OtpService;
 import bankService.view.MainView;
+import org.jline.reader.LineReader;
 
 
 /**
@@ -31,13 +32,14 @@ public class OtpRemainingTimeViewThread extends Thread {
             while (!isInterrupted()) {
                 long sec = otpService.getRemainingTrustSeconds();
 
+
                 // a안: 중요한 구간만 printAbove (한 번만!)
                 if (sec == 120 && !shown120) {
                     mainView.getReader().printAbove("[보안 ⏳] 120초 남음");
                     shown120 = true;
                 }
                 if (sec == 30 && !shown30)   {
-                    mainView.getReader().printAbove("[보안 ⏳] 30초 남음");
+                    mainView.getReader().printAbove("[보안 ⏳] 30초 남음 ");
                     shown30 = true;
                 }
                 if (sec == 5  && !shown5)    {

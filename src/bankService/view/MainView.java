@@ -80,6 +80,7 @@ public class MainView { // class start
         }
     }
 
+
     // ================== LineReader + 상태바 입력 유틸 ==================
 
     private int readInt(String prompt) {
@@ -113,6 +114,12 @@ public class MainView { // class start
         String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안❌ 재인증]";
         return prompt + msg + " ";
     }
+    // 로그아웃시 스레드 종료
+    public void stopOtpThread() {
+        if (otpTimerThread != null && otpTimerThread.isAlive()) {
+            otpTimerThread.interrupt();
+        }
+    }
 
     // ========== 이하 모든 readInt/readLine을 위 유틸로만 사용! ==========
 
@@ -127,12 +134,6 @@ public class MainView { // class start
         }
 
         while (true){
-            // 1) 보안 세션 확인/재인증
-            if (!ensureAuthenticated()) {
-                return false;
-            }   // if end
-
-            // 2) 메뉴 출력
             System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
             System.out.println("┃                 BB  BANK               ┃");
             System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
@@ -168,8 +169,8 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
-        if(choose ==1 ){ accountAdd(); }
-        else if (choose == 2 ){ accountDel(); }
+        if(choose ==1 ){ return accountAdd(); }
+        else if (choose == 2 ){ return accountDel(); }
         else if (choose == 3){ printMyTransactions(); }
         else if (choose == 4){ return true; }
         else {
@@ -273,8 +274,8 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
-        if(choose == 1){ deposit(); }
-        else if (choose == 2) { withdraw(); }
+        if(choose == 1){ return deposit(); }
+        else if (choose == 2) { return withdraw(); }
         else if (choose == 3) { return true; }
         return true;
     }   // func end
@@ -290,7 +291,7 @@ public class MainView { // class start
         int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
-        if(choose ==1 ){ transfer(); }
+        if(choose ==1 ){ return transfer(); }
         else if (choose ==2) { return true; }
         return true;
     }   // func end

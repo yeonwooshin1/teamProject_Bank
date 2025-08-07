@@ -6,6 +6,7 @@ import bankService.controller.UserController;
 import bankService.service.OtpService;
 
 
+import bankService.thread.OtpRemainingTimeViewThread;
 import bankService.view.MainView;
 import bankService.view.OtpView;
 import bankService.view.UserView;
@@ -57,16 +58,9 @@ public final class AppRouter {  // class start
                 // 로그인 view 결과값 반환
                 // 양수 = 성공 / uno 저장용으로 반환값 쓸 예정
                 // 0 = 실패 혹은 로그인 외 다른 메소드 실행( 재시도 함 )
-                // -1 = 종료 반환값
 
                 // 로그인뷰 불러오기
                 int result = login.index();
-
-                // 결과가 -1 이면 종료
-                if (result == -1) {
-                    System.out.println("안녕히 가세요.");
-                    break;
-                }   // if end
 
                 // 결과가 0이면 로그인뷰 재출력
                 if (result == 0) continue;      // 재시도
@@ -98,10 +92,14 @@ public final class AppRouter {  // class start
                     // 메인 세션 입장(스레드 시작)
                     boolean mainResult = main.mainIndex();
 
-                    // 반환값 false면 로그인 창 true면 mainView 재실행
-                    if (!mainResult) break;
+                    // 반환값 false면 로그인 창 부르고 스레드 종료 true면 mainView 재실행
+                    if (!mainResult) {
+                        main.stopOtpThread();
+                        break;
+                    }   // if end
 
                 }   // while end
+                OtpRemainingTimeViewThread.interrupted();
             } // while end
         } catch (IOException e) {
             System.out.println("JLine3 터미널 초기화 실패: " + e.getMessage());
