@@ -16,10 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 
-
-import java.awt.*;
-import java.util.ArrayList;
-
 // 메인 뷰
 public class MainView { // class start
 

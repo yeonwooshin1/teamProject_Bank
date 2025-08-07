@@ -49,8 +49,8 @@ public class OtpController {    // class start
         // value에 따라 다른 이메일을 보낸다.
         // 이메일 전송중 오류 예외처리
         try {
-            if(value == 1) emailService.sendOtpHtmlPW(email , otp);
-            else if(value == 2) emailService.sendOtpHtmlLogin(email , otp);
+            if(value == 1) emailService.sendOtpHtmlLogin(email , otp);
+            else if(value == 2) emailService.sendOtpHtmlPW(email , otp);
             else if(value == 3) emailService.sendOtpHtmlLockLogin(email , otp);
 
 
