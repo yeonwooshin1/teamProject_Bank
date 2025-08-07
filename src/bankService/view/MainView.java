@@ -268,6 +268,8 @@ public class MainView { // class start
         return true;
     }
 
+
+
     // 계좌 목록 view
     public void printMyTransactions() {
         Map<String, List<AccountDto>> txMap = accountController.getTransactionsByCurrentUser();
