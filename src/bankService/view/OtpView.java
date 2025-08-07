@@ -42,7 +42,7 @@ public class OtpView {  // class start
         while (true) {
             String input = ask("📨 OTP 입력 > ");
             int code = otpController.verifyOtp(input);
-            if (code == 5) { say("✅ 재인증 성공! 2분간 기능 사용 가능."); return; }
+            if (code == 5) { say("✅ 재인증 성공! 3분간 기능 사용 가능."); return; }
 
             switch (code) {
                 case 4 -> say("❌ OTP 불일치. 다시 시도해 주세요.");

@@ -6,7 +6,7 @@ import bankService.view.MainView;
 public class OtpRemainingTimeViewThread extends Thread {
     private final OtpService otp;
     private final MainView view;
-    private boolean s120, s30, s5;
+    private boolean s180, s30, s5;
 
     public OtpRemainingTimeViewThread(OtpService otp, MainView view) {
         this.otp = otp;
@@ -26,9 +26,9 @@ public class OtpRemainingTimeViewThread extends Thread {
                 long sec = otp.getRemainingTrustSeconds();
 
                 /* 입력 중이 아닐 때만 한-번-알림 */
-                if (sec == 120 && !s120 ) {
-                    notice("[보안 ⏳] 120초 남음");
-                    s120 = true;
+                if (sec == 180 && !s180 ) {
+                    notice("[보안 ⏳] 180초 남음");
+                    s180 = true;
                 }
                 if (sec == 30 && !s30) {
                     notice("[보안 ⏳] 30초 남음");
@@ -46,7 +46,7 @@ public class OtpRemainingTimeViewThread extends Thread {
                         : "";
                 view.setStatusBar(bar);
 
-                if (sec == 0) s120 = s30 = s5 = false;
+                if (sec == 0) s180 = s30 = s5 = false;
 
                 Thread.sleep(1000);
             }
