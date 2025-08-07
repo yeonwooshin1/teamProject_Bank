@@ -413,6 +413,9 @@ public class MainView { // class start
                 System.out.println("❌ 이체 실패!");
                 System.out.println("같은 계좌로 이체할 수 없습니다.");
             }
+
+
+
         }   // if end
         return true;
     }   // func end
