@@ -247,16 +247,25 @@ public class UserDao { // class start
                 ps0.setString(2, u_id);
                 ps0.executeUpdate();
             }
-            // 계좌 삭제
-            try (PreparedStatement ps1 = conn.prepareStatement(sql1)) {
-                ps1.setString(1, u_id);
-                ps1.executeUpdate();
+            // 1) 아이디 + 비밀번호가 DB에서 실제로 매칭되는지 확인
+            try (PreparedStatement test = conn.prepareStatement(
+                    "SELECT COUNT(*) FROM user WHERE u_id=? AND u_pwd=?")) {
+
+                test.setString(1, u_id);
+                test.setString(2, u_pwd);          // 평문 저장이면 그대로, 해시 저장이면 해시값
+                ResultSet rs = test.executeQuery();
+                rs.next();
+                System.out.println("[DEBUG] match rows = " + rs.getInt(1));  // 0 또는 1
             }
-            // 유저 삭제
-            try (PreparedStatement ps2 = conn.prepareStatement(sql2)) {
+
+// 2) 실제 삭제 수행
+            try (PreparedStatement ps2 = conn.prepareStatement(
+                    "DELETE FROM user WHERE u_id=? AND u_pwd=?")) {
+
                 ps2.setString(1, u_id);
                 ps2.setString(2, u_pwd);
                 int deleted = ps2.executeUpdate();
+                System.out.println("[DEBUG] deleted rows = " + deleted);     // 0 또는 1
                 return deleted == 1;
             }
         } catch (Exception e) {

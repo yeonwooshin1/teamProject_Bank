@@ -180,6 +180,12 @@ public class UserController { // class start
 
     // 계정 탈퇴
     public boolean deleteAccount(String u_id, String u_pwd) {
+        System.out.println(
+                "[DBG] id='"  + u_id  + "'("  + u_id.length()  + ") " +
+                        "pwd='" + u_pwd + "'(" + u_pwd.length() + ")"
+        );
+        for (char c : u_pwd.toCharArray()) System.out.print((int)c + " ");
+        System.out.println();
         return userDao.deleteAccount(u_id, u_pwd);
     }
 

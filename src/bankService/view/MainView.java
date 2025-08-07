@@ -9,8 +9,7 @@ import bankService.model.dto.*;
 import bankService.thread.OtpRemainingTimeViewThread;
 import bankService.util.MoneyUtil;
 import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
-import org.jline.reader.EndOfFileException;
+
 import bankService.model.dto.AccountDto;
 import java.util.List;
 
@@ -54,6 +53,7 @@ public class MainView { // class start
 
 
 
+
     /* 현재 readLine() 에서 사용된 프롬프트 문자열을 저장 → 알림 후 재그리기 용도 */
     private String currentPrompt = "";
 
@@ -77,62 +77,71 @@ public class MainView { // class start
         }
     }
 
-    // ───────────────── 알림 + 버퍼 초기화 ─────────────────
+    /* MainView.java */
     public void showNoticeAndClearBuffer(String msg) {
         synchronized (ioLock) {
-            var term = reader.getTerminal();
+            /* 1) 현재 편집 줄 백업 */
+            String bufLine = reader.getBuffer().toString();
 
-            /* ① 현재 입력 라인 전체 삭제 + 커서 맨 앞으로 */
-            term.writer().print("\033[2K\r");   // ANSI ESC[2K + CR
-
-            /* ② JLine 내부 버퍼 클리어 */
+            /* 2) 줄 전체 삭제 */
+            reader.getTerminal().writer().print("\033[2K\r");
+            reader.getTerminal().flush();
             reader.getBuffer().clear();
 
-            /* ③ 알림을 한 줄 위에 출력 */
+            /* 3) 알림 한 줄 출력 (JLine이 바로 프롬프트+입력 재그리기) */
             reader.printAbove(msg);
 
+            /* 4) 버퍼만 복원 → REDRAW_LINE 호출로 한 번 더 정확히 그리기 */
+            reader.getBuffer().write(bufLine);
+            reader.callWidget(org.jline.reader.LineReader.REDRAW_LINE);
         }
     }
 
     // ───────────────── 입력 유틸 ─────────────────
+
+    // MainView.java  (클래스 맨 위 필드 부분)
+    private volatile boolean inputInProgress = false;   // ★ 추가: 입력 중 여부
+
+    public void setInputInProgress(boolean v) { inputInProgress = v; }  // ★ 추가
+    public boolean isInputInProgress()       { return inputInProgress; } // ★ 추가
+
+    /* 공통 헬퍼: 한 줄 입력 후 버퍼 클리어 */
+    private String readOneLine(String prompt) {
+        try {
+            currentPrompt = prompt + " ";
+            return reader.readLine(currentPrompt).trim();   // ① 사용자 입력
+        } finally {
+            reader.getBuffer().clear();                     // ② 입력 완료 직후 버퍼 삭제
+        }
+    }
+
+    /* ─ readLine() ─ */
+    private String readLine(String prompt) {
+        printStatusBarIfPresent();
+        setInputInProgress(true);
+        try {
+            return readOneLine(prompt);                     // 캐시 → 버퍼 복원 끊김
+        } finally {
+            setInputInProgress(false);
+        }
+    }
+
+    /* ─ readInt() ─ */
     private int readInt(String prompt) {
         while (true) {
-            printStatusBarIfPresent();                   // ✔ 상태바 한 줄 먼저 띄우기
-            currentPrompt = prompt + " ";                // ✔ 프롬프트는 깔끔하게
+            printStatusBarIfPresent();
+            setInputInProgress(true);
             try {
-                String line = reader.readLine(currentPrompt)
-                        .split("\\[", 2)[0]
-                        .trim();
-                return Integer.parseInt(line);
+                String s = readOneLine(prompt);
+                return Integer.parseInt(s);
             } catch (NumberFormatException e) {
                 synchronized (ioLock) { System.out.println("숫자를 입력하세요."); }
-            } catch (UserInterruptException | EndOfFileException e) {
-                synchronized (ioLock) { System.out.println(); }
-                return -1;
+            } finally {
+                setInputInProgress(false);
             }
         }
     }
 
-    private String readLine(String prompt) {
-        printStatusBarIfPresent();                   // ✔ 상태바 한 줄 먼저 띄우기
-        currentPrompt = prompt + " ";                // ✔ 프롬프트는 깔끔하게
-        try {
-            return reader.readLine(currentPrompt)
-                    .split("\\[", 2)[0]
-                    .trim();
-        } catch (UserInterruptException | EndOfFileException e) {
-            synchronized (ioLock) { System.out.println(); }
-            return "";
-        }
-    }
-
-    /* 남은 인증시간을 프롬프트에 붙여주는 헬퍼 */
-    private String fullPromptWithTime(String prompt) {
-        long sec = ctx.otp().getRemainingTrustSeconds();
-        String tail = (sec > 0) ? String.format(" [보안⏳ %d초 남음]", sec)
-                : "";
-        return prompt + tail + " ";
-    }
     // 로그아웃시 스레드 종료
     public void stopOtpThread() {
         if (otpTimerThread != null && otpTimerThread.isAlive()) {
