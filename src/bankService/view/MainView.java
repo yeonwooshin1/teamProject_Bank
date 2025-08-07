@@ -320,7 +320,6 @@ public class MainView { // class start
         TransactionDto dto = new TransactionDto(account_no , account_pwd , amount);
         TransactionResultDto resultDto = accountController.deposit(dto);
 
-
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
@@ -356,10 +355,8 @@ public class MainView { // class start
 
         TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
         TransactionResultDto resultDto = accountController.withdraw(dto);
-
-
         if(resultDto.isSuccess()){
-            System.out.println("✅ 출금 성공!");
+            System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
             System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
@@ -400,9 +397,7 @@ public class MainView { // class start
         } // if e
 
         TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
-
         TransferResultDto resultDto = accountController.transfer(dto);
-
 
         if (resultDto.isSuccess()) {
             System.out.println("✅ 이체 성공!");

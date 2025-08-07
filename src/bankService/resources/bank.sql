@@ -115,7 +115,8 @@ INSERT INTO user (u_id, u_pwd, u_name, u_phone, u_email, u_date) VALUES
 ('user67','t3m6n1x8','류정민','010-4307-9652','user67@example.com','1991-01-05'),
 ('user68','w2k9p5v4','안서윤','010-8674-3250','user68@example.com','1978-07-16'),
 ('user69','y7x0r3n1','장성우','010-3951-7806','user69@example.com','1996-09-13'),
-('user70','d8p2v6m0','김채린','010-2869-1457','user70@example.com','1984-02-22');
+('user70','d8p2v6m0','김채린','010-2869-1457','user70@example.com','1984-02-22'),
+('rufp9801','test1234!','이겨레','010-8749-1651','rufp9891@gmail.com','1998-01-01');
 
 INSERT INTO account (uno, account_no, account_pwd) VALUES
 (1,'111-100-203123','123456'),	-- 입출 출금시 default 해야할 admin 계좌번호! 
@@ -188,7 +189,8 @@ INSERT INTO account (uno, account_no, account_pwd) VALUES
 (67,'111-262-834195','453601'),
 (68,'111-277-675142','139705'),
 (69,'111-258-342809','560127'),
-(70,'111-294-130376','693842')
+(70,'111-294-130376','693842'),
+(71,'111-123-1234','111111')
 ;
 
 
