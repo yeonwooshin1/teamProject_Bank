@@ -65,17 +65,18 @@ public class OtpView {  // class start
         }   // while end
     }   // func end
 
-    // 입력
+    /* 알림 출력은 ioLock 으로 보호 */
     private void say(String msg) {
         synchronized (ioLock) {
             reader.printAbove(msg);
-        }   // syn end
-    }   // func end
+        }
+    }
 
-    // 출력
+    /* 입력: 프롬프트 저장 & ANSI 충돌 방지용 split */
     private String ask(String prompt) {
-        synchronized (ioLock) {
-            return reader.readLine(prompt).trim();
-        }   // syn end
-    }   // func end
+        String full = prompt;   // OTP 입력에는 남은 시간 tail 불필요
+        return reader.readLine(full)
+                .split("\\[", 2)[0]
+                .trim();
+    }
 }   // class end
