@@ -66,6 +66,7 @@ public class MainView { // class start
      * - 이 메서드는 단순히 문자열만 갱신한다! (println에서 직접 출력)
      */
     public void setStatusBar(String msg) {
+        if (this.statusBar != null && this.statusBar.equals(msg)) return; // 중복 방지
         this.statusBar = msg;   // 메뉴 출력 이후 하단에 출력 용도
     }
 
@@ -132,17 +133,12 @@ public class MainView { // class start
             }   // if end
 
             // 2) 메뉴 출력
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                                      ┃");
-            System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-            System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-            System.out.println("┃                                      ┃");
-            System.out.println("┃            BANK 프로그램               ┃");
-            System.out.println("┃                                      ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+            System.out.println("┃                 BB  BANK               ┃");
+            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
             System.out.println("[1] 계좌관리  [2] 입·출금  [3] 계좌이체");
             System.out.println("[4] 보안설정  [0] 로그아웃");
-            int choose = readInt("선택 ➜");
+            int choose = readInt("선택 ➜ ");
 
             System.out.println("==========================================");
 
@@ -162,19 +158,14 @@ public class MainView { // class start
     // 계좌 통합 view
     public boolean account(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("[1] 새 계좌 개설");
         System.out.println("[2] 계좌 해지");
         System.out.println("[3] 내 계좌 목록");
         System.out.println("[4] 뒤로");
-        int choose = readInt("선택 ➜");
+        int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
         if(choose ==1 ){ accountAdd(); }
@@ -187,27 +178,22 @@ public class MainView { // class start
         return true;
     }   // func end
 
-
+    // 계좌 생성 view
     public boolean accountAdd() {
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 새 계좌 개설 >");
 
         String account_pwd;
         while (true) {
-            account_pwd = readLine("계좌 비밀번호 설정 (6자리 숫자): ");
+            account_pwd = readLine("계좌 비밀번호 설정 (6자리 숫자를 입력하세요) : ");
             if (account_pwd.length() == 6 && account_pwd.matches("\\d{6}")) {
                 break; // 조건 만족하면 탈출
             }
             System.out.println("비밀번호는 6자리 숫자여야 합니다. 다시 입력해주세요.");
-        }
+        }   // while end
 
         boolean result = accountController.accountAdd(account_pwd);
 
@@ -215,25 +201,20 @@ public class MainView { // class start
             System.out.println("계좌가 개설되었습니다.");
         } else {
             System.out.println("계좌 개설 실패");
-        }
+        }   // if end
 
         return true;
-    }
+    }   // func end
 
     // 계좌 해지 view
     public boolean accountDel(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 계좌 해지 >");
-        String account_no = readLine("해지할 계좌 번호:");
-        String account_pwd = readLine("계좌 비밀 번호 :");
+        String account_no = readLine("해지할 계좌 번호 : ");
+        String account_pwd = readLine("계좌 비밀 번호 : ");
 
         if (!ensureAuthenticated()) return false;
 
@@ -255,7 +236,7 @@ public class MainView { // class start
         if (txMap.isEmpty()) {
             System.out.println("거래 내역이 없습니다.");
             return;
-        }
+        }   // if end
 
         for (String accNo : txMap.keySet()) {
             System.out.println("\n계좌번호: " + accNo);
@@ -264,8 +245,8 @@ public class MainView { // class start
             long balance = 0;
             for (AccountDto tx : txMap.get(accNo)) {
                 switch (tx.getType()) {
-                    case "입금" -> balance += tx.getAmount();
-                    case "출금", "이체" -> balance -= tx.getAmount();
+                    case "입금", "이체_입금" -> balance += tx.getAmount();
+                    case "출금", "이체_출금" -> balance -= tx.getAmount();
                 }
 
                 System.out.printf("%-10s %-15s %-15s %-20s %10s\n",
@@ -274,27 +255,22 @@ public class MainView { // class start
                         MoneyUtil.formatWon((int)balance),
                         tx.getT_date(),
                         tx.getMemo() == null ? "null" : tx.getMemo());
-            }
-        }
-    }
+            }   // for end
+        }   // for end
+    }   // func end
 
     // ================================ 입·출금 , 이체 ================================ //
 
     // 입출금 view
     public boolean transation(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("[1] 입금");
         System.out.println("[2] 출금");
         System.out.println("[3] 뒤로");
-        int choose = readInt("선택 ➜");
+        int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
         if(choose == 1){ deposit(); }
@@ -306,17 +282,12 @@ public class MainView { // class start
     // 이체 view
     public boolean transferView(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("[1] 이체");
         System.out.println("[2] 뒤로");
-        int choose = readInt("선택 ➜");
+        int choose = readInt("선택 ➜ ");
         System.out.println("==========================================");
 
         if(choose ==1 ){ transfer(); }
@@ -327,18 +298,13 @@ public class MainView { // class start
     // 입금 view
     public boolean deposit(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 입금 >");
-        String account_no = readLine("입금할 계좌 :");
-        String account_pwd = readLine("계좌 비밀번호 :");
-        int amount = readInt("입금할 금액 :");
+        String account_no = readLine("입금할 계좌 : ");
+        String account_pwd = readLine("계좌 비밀번호 : ");
+        int amount = readInt("입금할 금액 : ");
 
         if (!ensureAuthenticated()) return false;
 
@@ -348,7 +314,7 @@ public class MainView { // class start
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             System.out.println("❌ 입금 실패!");
             System.out.println("에러 메시지 : " + resultDto.getMessage());
@@ -359,18 +325,13 @@ public class MainView { // class start
     // 출금 view
     public boolean withdraw(){
         if (!ensureAuthenticated()) return false;
-        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-        System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┃            BANK 프로그램               ┃");
-        System.out.println("┃                                      ┃");
-        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+        System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+        System.out.println("┃                 BB  BANK               ┃");
+        System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 출금 >");
-        String account_no = readLine("출금할 계좌번호를 입력하세요. :");
-        String account_pwd = readLine("계좌 비밀번호 입력 :");
-        int amount = readInt("출금할 금액 :");
+        String account_no = readLine("출금할 계좌번호를 입력하세요 : ");
+        String account_pwd = readLine("계좌 비밀번호 입력 : ");
+        int amount = readInt("출금할 금액 : ");
 
         if (!ensureAuthenticated()) return false;
 
@@ -379,12 +340,12 @@ public class MainView { // class start
         if(resultDto.isSuccess()){
             System.out.println("✅ 입금 성공!");
             System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + resultDto.getBalance()+ "원");
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         }else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
                 System.out.println("❌ 출금 실패!");
                 System.out.println("잔액 부족");
-                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+                System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             } else {
                 System.out.println("❌ 출금 실패!");
                 System.out.println("에러 메시지 : " + resultDto.getMessage());
@@ -400,11 +361,11 @@ public class MainView { // class start
         System.out.println("┃                 BB  BANK               ┃");
         System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
         System.out.println("< 이체 >");
-        String sender_no = readLine("이체할 계좌 :");
-        String receiver_no = readLine("이체받는 계좌 :");
-        String account_pwd = readLine("계좌 비밀번호 :");
-        int amount = readInt("이체할 금액 :");
-        String memo = readLine("이체 메모 :");
+        String sender_no = readLine("이체할 계좌 : ");
+        String receiver_no = readLine("이체받는 계좌 : ");
+        String account_pwd = readLine("계좌 비밀번호 : ");
+        int amount = readInt("이체할 금액 : ");
+        String memo = readLine("이체 메모 : ");
 
         if (!ensureAuthenticated()) return false;
 
@@ -413,11 +374,13 @@ public class MainView { // class start
 
         if (resultDto.isSuccess()) {
             System.out.println("✅ 이체 성공!");
+            System.out.println("메시지 : " + resultDto.getMessage());
+            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
         } else {
             if ("잔액이 부족합니다.".equals(resultDto.getMessage())) {
                 System.out.println("❌ 이체 실패!");
                 System.out.println("잔액 부족");
-                System.out.println("잔액 : " + resultDto.getBalance() + "원");
+                System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
         }   // if end
         return true;
@@ -429,19 +392,14 @@ public class MainView { // class start
     public boolean securitySettingsView() {
         while (true) {
             if (!ensureAuthenticated()) return false;
-            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
-            System.out.println("┃                                      ┃");
-            System.out.println("┃   █▀█ █▀█ █▄█ █▀▄ █▀█    ┃");
-            System.out.println("┃   █▄█ █▄█  █  █▄▀ █▄█    ┃");
-            System.out.println("┃                                      ┃");
-            System.out.println("┃            BANK 프로그램               ┃");
-            System.out.println("┃                                      ┃");
-            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
+            System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓");
+            System.out.println("┃                 BB  BANK               ┃");
+            System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛");
             System.out.println("< 보안 설정 >");
             System.out.println("[1] 비밀번호 변경");
             System.out.println("[2] 회원 탈퇴");
             System.out.println("[3] 뒤로");
-            int choose = readInt("선택 ➜");
+            int choose = readInt("선택 ➜ ");
             System.out.println("==========================================");
 
             switch (choose) {
@@ -457,21 +415,21 @@ public class MainView { // class start
     public boolean changePassword() {
         if (!ensureAuthenticated()) return false;
 
-        String u_id = readLine("아이디:");
-        String u_pwd = readLine("현재 비밀번호:");
+        String u_id = readLine("아이디 : ");
+        String u_pwd = readLine("현재 비밀번호 : ");
 
         if (!ensureAuthenticated()) return false;
 
         boolean check = userController.verifyPassword(u_id, u_pwd);
 
         if (check) {
-            String newPwd = readLine("새 비밀번호:");
+            String newPwd = readLine("새 비밀번호 : ");
 
             if (!ensureAuthenticated()) return false;
 
             boolean result = userController.update2Password(u_id, newPwd);
             if (result) System.out.println("비밀번호가 성공적으로 변경되었습니다.");
-            else        System.out.println("비밀번호 변경에 실패했습니다.");
+            else  System.out.println("비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
         } else {
             System.out.println("비밀번호가 일치하지 않습니다.");
         }   // if end
@@ -482,8 +440,8 @@ public class MainView { // class start
     public boolean deleteAccount() {
         if (!ensureAuthenticated()) return false;
 
-        String u_id = readLine("아이디:");
-        String u_pwd = readLine("비밀번호:");
+        String u_id = readLine("아이디 : ");
+        String u_pwd = readLine("비밀번호 : ");
 
         if (!ensureAuthenticated()) return false;
 
@@ -510,14 +468,14 @@ public class MainView { // class start
         if (otpController.trustOtp()) return true;
 
         while (true) {
-            String ans = readLine("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? (Y/N):").toLowerCase();
+            String ans = readLine("⚠️ 보안 세션이 만료되었습니다. 인증하시겠습니까? ( Y / N ): ").toLowerCase();
 
             if (ans.equals("y")) {
                 OtpView.getInstance().forceReauth();
                 return otpController.trustOtp();
             }
             else if (ans.equals("n")) {
-                String ansRe = readLine("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? (Y/N):").toLowerCase();
+                String ansRe = readLine("⚠️ 미인증시 로그아웃 됩니다. 인증 하시겠습니까? ( Y / N ): ").toLowerCase();
 
                 if (ansRe.equals("y")) {
                     OtpView.getInstance().forceReauth();

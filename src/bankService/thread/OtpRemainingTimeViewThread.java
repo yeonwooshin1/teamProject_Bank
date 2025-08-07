@@ -47,9 +47,12 @@ public class OtpRemainingTimeViewThread extends Thread {
 
                 // b안: 아래쪽 상태바(실시간)
                 String msg;
-                if (sec > 0)      msg = String.format("[보안 ⏳] %d초 남음", sec);
-                else if (otpService.checkValidUntil()) msg = "[보안 ⏳] 계산 중...";
-                else              msg = "[보안 ❌] 재인증 필요";
+                if (otpService.checkValidUntil()) {
+                    if (sec > 0) msg = String.format("[보안 ⏳] %d초 남음", sec);
+                    else         msg = "[보안 ✅] 인증됨";
+                } else {
+                    msg = "";
+                }   // if end
                 mainView.setStatusBar(msg);
 
                 // 0초가 되면 모든 플래그 리셋 (다음 인증 주기 위해)

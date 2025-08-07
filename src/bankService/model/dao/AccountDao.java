@@ -111,7 +111,7 @@ public class AccountDao {
 
             if("이체".equals(type)){
 
-                // 출금 내역 저장 (from_acno -> 은행계좌)
+                // ① 출금 내역 → from → 은행(1001) : "이체_출금"
                 String withdrawSql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(withdrawSql)){
@@ -119,12 +119,12 @@ public class AccountDao {
                     ps.setInt(1 , from);
                     ps.setInt(2 , 1001);    // 은행계좌
                     ps.setInt(3, amount);
-                    ps.setString(4,"출금");
+                    ps.setString(4,"이체_출금");
                     ps.setString(5, memo);
                     ps.executeUpdate();
                 } // try e
 
-                // 입금 내역 저장 (은행계좌 -> to_acno)
+                // ② 입금 내역 → 은행(1001) → to : "이체_입금"
                 String depositSql =  "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(depositSql)){
@@ -132,14 +132,14 @@ public class AccountDao {
                     ps.setInt(1, 1001);
                     ps.setInt(2, to);
                     ps.setInt(3, amount);
-                    ps.setString(4, "입금");
+                    ps.setString(4, "이체_입금");
                     ps.setString(5,memo);
                     ps.executeUpdate();
                 } // try e
 
             } // if e
             else {
-                // 입금 or 출금
+                // 단일 거래 (입금 or 출금) 저장
                 String sql = "insert into transaction (from_acno , to_acno , amount , type , memo , t_date )" +
                         "values ( ? , ? , ? , ? , ? , now())";
                 try (PreparedStatement ps = conn.prepareStatement(sql)){
@@ -216,7 +216,7 @@ public class AccountDao {
             // 중복되지 않는 계좌번호 생성
             while (!accountCheck(account_no)) {  // 중복이면 다시 생성
                 account_no = AccountUtil.generateAccountNumber();
-            }
+            }   // while end
 
             String sql = "INSERT INTO account ( uno , account_no, account_pwd) VALUES (? , ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -226,17 +226,17 @@ public class AccountDao {
 
             int result = ps.executeUpdate();
             if (result == 1) {
-                System.out.println("신규 계좌번호 : "+account_no+" 입니다.");
+                System.out.println("신규 계좌번호는 '"+account_no+"' 입니다.");
                 return true;
             } else {
                 return false;
-            }
+            }   // if end
 
         } catch (Exception e) {
             System.out.println("계좌 등록 실패: " + e);
             return false;
-        }
-    }
+        }   // try catch end
+    }   // func end
 
     // 계좌 존재 여부 및 uno 조회
     public Integer getUnoByAccount(String account_no, String account_pwd) {
@@ -249,12 +249,12 @@ public class AccountDao {
 
             if (rs.next()) {
                 return rs.getInt("uno");
-            }
+            }   // if end
         } catch (Exception e) {
             System.out.println("uno 조회 실패: " + e);
-        }
+        }   // try catch end
         return null;
-    }
+    }   // func end
 
 
     // 해지할 계좌 번호 일치 x
@@ -268,9 +268,9 @@ public class AccountDao {
         }catch (Exception e){
             System.out.println("존재하지않음"+e);
             return false;
-        }
+        }   // try catch end
 
-    }
+    }   // func end
 
     // 계좌 해지
     public boolean accountDel(String account_no, String account_pwd, int uno) { // 계좌번호 , 패스워드
@@ -287,7 +287,7 @@ public class AccountDao {
             if (!rs.next()) {
                 conn.rollback();
                 return false;
-            }
+            }   // if end
             int acno = rs.getInt("acno");
 
             // 2. transaction 테이블에서 거래내역 삭제
@@ -309,7 +309,7 @@ public class AccountDao {
             } else {
                 conn.rollback();
                 return false;
-            }
+            }   // if end
 
         } catch (Exception e) {
             try { conn.rollback(); } catch (Exception ex) {}
@@ -317,8 +317,8 @@ public class AccountDao {
             return false;
         } finally {
             try { conn.setAutoCommit(true); } catch (Exception ex) {}
-        }
-    }
+        }   // try end
+    }   // func end
 
 
 
@@ -336,13 +336,13 @@ public class AccountDao {
 
             while (rs.next()) {
                 list.add(rs.getString("account_no"));
-            }
+            }   // while end
         } catch (Exception e) {
             System.out.println("계좌 목록 조회 실패: " + e.getMessage());
-        }
+        }   // try end
 
         return list;
-    }
+    }   // func end
 
     // 계좌번호로 거래내역 조회
     public ArrayList<AccountDto> accountListByAccountNo(String accountNo) {
@@ -373,12 +373,12 @@ public class AccountDao {
                         rs.getString("t_date")
                 );
                 list.add(dto);
-            }
+            }   // while end
         } catch (Exception e) {
             System.out.println("거래 내역 조회 실패: " + e.getMessage());
-        }
+        }   // try end
 
         return list;
-    }
+    }   // func end
 
 } // class e

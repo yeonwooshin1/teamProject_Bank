@@ -16,28 +16,17 @@ public class UserDto { // class start
     private String u_phone; // 회원 전화번호
     private String u_email; // 회원 이메일
     private LocalDate u_date; // 회원 생년월일
-    private int state; // 회원 상태
+//    private int state; // 회원 상태 안쓸거
+
+    // 기본생성자
+    public UserDto(){}
+
 
     // 생성자
-
-    public UserDto( String u_id, String u_pwd, String u_name, String u_phone, String u_email, LocalDate u_date, int state) {
-        this.uno = uno;
-        this.u_id = u_id;
-        this.u_pwd = u_pwd;
-        this.u_name = u_name;
-        this.u_phone = u_phone;
-        this.u_email = u_email;
-        this.u_date = u_date;
-        this.state = state;
-    }
-
-    public UserDto(){}
     public UserDto(String u_id, String u_pwd) {
         this.u_id = u_id;
         this.u_pwd = u_pwd;
     }
-
-
     public UserDto(String u_id, String u_pwd, String u_name, String u_phone, String u_email, LocalDate u_date) {
         this.u_id = u_id;
         this.u_pwd = u_pwd;
@@ -47,8 +36,8 @@ public class UserDto { // class start
         this.u_date = u_date;
     }
 
+
     // setter and getter
-    // 각 필드별로 값을 읽고(set)/변경(get)
     public int getUno() {
         return uno;
     }
@@ -96,12 +85,12 @@ public class UserDto { // class start
     public void setU_date(String u_date) {
         this.u_date = LocalDate.parse(u_date);
     }
-    public int getState() {
-        return state;
-    }
-    public void setState(int state) {
-        this.state = state;
-    }
+//    public int getState() {
+//        return state;
+//    }
+//    public void setState(int state) {
+//        this.state = state;
+//    }
 
     // toString
     @Override
@@ -113,7 +102,7 @@ public class UserDto { // class start
                 ", u_phone='" + u_phone + '\'' +
                 ", u_email='" + u_email + '\'' +
                 ", u_date='" + u_date + '\'' +
-                ", state=" + state +
+//                ", state=" + state +
                 '}';
     }
 } // class end
