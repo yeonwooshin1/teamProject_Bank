@@ -99,6 +99,10 @@ public class UserController { // class start
             return -5;
         }   // if end
 
+
+
+
+
         // 리스트 만들어서
         ArrayList<String> hostList = new ArrayList<>();
         hostList.add("gmail.com");
