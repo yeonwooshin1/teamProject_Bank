@@ -39,10 +39,17 @@ public final class AppRouter {  // class start
             final Scanner scan = new Scanner(System.in);
 
             // JLine3 터미널/리더 준비
-            final Terminal terminal = TerminalBuilder.builder().system(true).build();
+
+            final Terminal terminal = TerminalBuilder.builder()
+                    .system(true)
+                    .build();
+
             final LineReader reader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .build();
+
+            /* ★ Bash-식 이벤트 확장(!!, !123 등) 완전히 비활성화 */
+            reader.setOpt(LineReader.Option.DISABLE_EVENT_EXPANSION);
 
             // 싱글톤 가져오기
             final UserView login = UserView.getInstance();

@@ -42,7 +42,7 @@ public class OtpView {  // class start
         while (true) {
             String input = ask("📨 OTP 입력 > ");
             int code = otpController.verifyOtp(input);
-            if (code == 5) { say("✅ 재인증 성공! 2분간 기능 사용 가능."); return; }
+            if (code == 5) { say("✅ 재인증 성공! 3분간 기능 사용 가능."); return; }
 
             switch (code) {
                 case 4 -> say("❌ OTP 불일치. 다시 시도해 주세요.");
@@ -65,17 +65,18 @@ public class OtpView {  // class start
         }   // while end
     }   // func end
 
-    // 입력
+    /* 알림 출력은 ioLock 으로 보호 */
     private void say(String msg) {
         synchronized (ioLock) {
             reader.printAbove(msg);
-        }   // syn end
-    }   // func end
+        }
+    }
 
-    // 출력
+    /* 입력: 프롬프트 저장 & ANSI 충돌 방지용 split */
     private String ask(String prompt) {
-        synchronized (ioLock) {
-            return reader.readLine(prompt).trim();
-        }   // syn end
-    }   // func end
+        String full = prompt;   // OTP 입력에는 남은 시간 tail 불필요
+        return reader.readLine(full)
+                .split("\\[", 2)[0]
+                .trim();
+    }
 }   // class end

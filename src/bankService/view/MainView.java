@@ -5,21 +5,16 @@ import bankService.controller.AccountController;
 import bankService.controller.OtpController;
 import bankService.controller.UserController;
 import bankService.model.dto.*;
-import bankService.service.OtpService;
+
 import bankService.thread.OtpRemainingTimeViewThread;
 import bankService.util.MoneyUtil;
 import org.jline.reader.LineReader;
-import org.jline.reader.UserInterruptException;
-import org.jline.reader.EndOfFileException;
+
 import bankService.model.dto.AccountDto;
 import java.util.List;
-import java.util.ArrayList;
+
 import java.util.Map;
-import java.util.LinkedHashMap;
 
-
-import java.awt.*;
-import java.util.ArrayList;
 
 // 메인 뷰
 public class MainView { // class start
@@ -50,76 +45,113 @@ public class MainView { // class start
         this.ctx  = ctx;
         this.ioLock = ctx.ioLock();
         this.reader = ctx.reader(); // LineReader로 변경
+        statusBar = "";          // ★ 이전 세션 메시지 초기화
     }   // wire end
 
 
 
-    public LineReader getReader() {
-        return reader;
-    }   // getter
 
-    // 1. 상태바 문자열(volatile: 멀티스레드 안전)
-    private volatile String statusBar = "";   // [상태바] 현재 남은 OTP 신뢰 시간 등 출력
+    /* 현재 readLine() 에서 사용된 프롬프트 문자열을 저장 → 알림 후 재그리기 용도 */
+    private String currentPrompt = "";
 
-    /**
-     * [상태바 메세지 갱신용] OtpRemainingTimeViewThread 등에서 호출
-     * - 이 메서드는 단순히 문자열만 갱신한다! (println에서 직접 출력)
-     */
+    /* 1) 상태바 문자열 (멀티스레드 안전) */
+    private volatile String statusBar = "";
+
+    // ───────────────── 상태바 관련 ─────────────────
     public void setStatusBar(String msg) {
-        if (this.statusBar != null && this.statusBar.equals(msg)) return; // 중복 방지
-        this.statusBar = msg;   // 메뉴 출력 이후 하단에 출력 용도
+        if (msg != null && msg.equals(this.statusBar)) return;
+        this.statusBar = msg;
     }
 
-    /**
-     * [상태바 출력] 메뉴/화면 출력 끝나고 마지막 줄에 호출!
-     * - 이걸 각 메뉴/목록 출력 후 호출하면, printAbove 없이도 아래에 상태처럼 보임.
-     */
+    public LineReader getReader() { return reader; }
+
+    // (메뉴 출력이 끝난 뒤 호출하면 상태바 1줄 표시)
     private void printStatusBarIfPresent() {
         if (statusBar != null && !statusBar.isEmpty()) {
-            System.out.println(statusBar);
-        }
-    }
-
-
-    // ================== LineReader + 상태바 입력 유틸 ==================
-
-    private int readInt(String prompt) {
-        while (true) {
-            printStatusBarIfPresent(); // 입력 전 상태바 출력
             synchronized (ioLock) {
-                try {
-                    String line = reader.readLine(prompt).trim();
-                    return Integer.parseInt(line);
-                } catch (NumberFormatException e) {
-                    System.out.println("숫자를 입력하세요.");
-                    // 계속 반복해서 다시 입력받음
-                } catch (UserInterruptException | EndOfFileException e) {
-                    System.out.println();
-                    return -1; // 입력 중단
-                }
+                System.out.println(statusBar);
             }
         }
     }
 
-    private String readLine(String prompt) {
-        printStatusBarIfPresent(); // 입력 전 상태바 출력
+    /* MainView.java */
+    public void showNoticeAndClearBuffer(String msg) {
         synchronized (ioLock) {
-            return reader.readLine(prompt).trim();
-        }
-    }   // readLine end
 
-    /** [남은 인증시간 프롬프트 꾸미기 */
-    private String fullPromptWithTime(String prompt) {
-        long sec = ctx.otp().getRemainingTrustSeconds();
-        String msg = (sec > 0) ? String.format(" [보안⏳ %d초]", sec) : " [보안 ⚠\uFE0F 재인증]";
-        return prompt + msg + " ";
+            /* 1) 현재 입력 줄 백업 */
+            String bufLine = reader.getBuffer().toString();
+            String prompt  = currentPrompt;          // 우리가 마지막에 넣어둔 프롬프트
+
+            /* 2) 줄 삭제 */
+            var term = reader.getTerminal();
+            term.writer().print("\033[2K\r");        // ESC[2K + CR
+            term.flush();
+            reader.getBuffer().clear();
+
+            /* 3) 알림 출력 (printAbove 가 프롬프트•입력 자동 재그리기) */
+            reader.printAbove(msg);
+
+            /* 4) 입력 내용만 다시 덮어씀 (프롬프트는 이미 있음) */
+            term.writer().print(bufLine);
+            term.flush();
+
+            /* 5) 버퍼 복원 → 편집 계속 가능 */
+            reader.getBuffer().write(bufLine);
+        }
     }
+
+    // ───────────────── 입력 유틸 ─────────────────
+
+    // MainView.java  (클래스 맨 위 필드 부분)
+    private volatile boolean inputInProgress = false;   // ★ 추가: 입력 중 여부
+
+    public void setInputInProgress(boolean v) { inputInProgress = v; }  // ★ 추가
+    public boolean isInputInProgress()       { return inputInProgress; } // ★ 추가
+
+    /* 공통 헬퍼: 한 줄 입력 후 버퍼 클리어 */
+    private String readOneLine(String prompt) {
+        try {
+            currentPrompt = prompt + " ";
+            return reader.readLine(currentPrompt).trim();   // ① 사용자 입력
+        } finally {
+            reader.getBuffer().clear();                     // ② 입력 완료 직후 버퍼 삭제
+        }
+    }
+
+    /* ─ readLine() ─ */
+    private String readLine(String prompt) {
+        printStatusBarIfPresent();
+        setInputInProgress(true);
+        try {
+            return readOneLine(prompt);                     // 캐시 → 버퍼 복원 끊김
+        } finally {
+            setInputInProgress(false);
+        }
+    }
+
+    /* ─ readInt() ─ */
+    private int readInt(String prompt) {
+        while (true) {
+            printStatusBarIfPresent();
+            setInputInProgress(true);
+            try {
+                String s = readOneLine(prompt);
+                return Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                synchronized (ioLock) { System.out.println("숫자를 입력하세요."); }
+            } finally {
+                setInputInProgress(false);
+            }
+        }
+    }
+
     // 로그아웃시 스레드 종료
     public void stopOtpThread() {
         if (otpTimerThread != null && otpTimerThread.isAlive()) {
             otpTimerThread.interrupt();
-        }
-    }
+        }   // if end
+        statusBar = "";          // ★ 이전 세션 메시지 초기화
+    }   // func end
 
     // ========== 이하 모든 readInt/readLine을 위 유틸로만 사용! ==========
 
