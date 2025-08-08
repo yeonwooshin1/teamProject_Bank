@@ -381,160 +381,281 @@ public class MainView { // class start
 
         if(choose ==1 ){ return transfer(); }
         else if (choose ==2) { return true; }
-        return true;
+        else {
+            System.out.println("⚠\uFE0F 메뉴에 있는 숫자를 입력해주세요.");
+            return transferView();
+        }
     }   // func end
 
     // 입금 view
-    public boolean deposit(){
+    public boolean deposit() {
         if (!ensureAuthenticated()) return false;
 
+        outer: while (true) {
+            System.out.println("===================================================================\n");
+            System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                    "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                    "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                    "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                    "                                                                 ");
+            System.out.println("===================================================================");
+            System.out.println("< 입금 >");
 
-
-        System.out.println("===================================================================\n");
-        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
-                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
-                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
-                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
-                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
-                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
-                "                                                                 ");
-        System.out.println("===================================================================");
-        System.out.println("< 입금 >");
-        String account_no = readLine("입금할 계좌 : ");
-        String account_pwd = readLine("계좌 비밀번호 : ");
-        int amount = readInt("입금할 금액 : ");
-
-        if (!ensureAuthenticated()) return false;
-
-        // 거래 금액 100만원 이상일 시 응답받기
-        if(amount >= 1000000 ){
-            String answer = readLine("⚠\uFE0F 입금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
-            if(answer.equals("n")){
-                System.out.println("⚠\uFE0F 입금 취소!");
-                return false;
+            String account_no;
+            while (true) {
+                account_no = readLine("입금할 계좌 : ");
+                if (account_no != null && !account_no.trim().isEmpty()) break;
+                System.out.println("⚠ 계좌번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
             }
-        } // if e
 
-        TransactionDto dto = new TransactionDto(account_no , account_pwd , amount);
-        TransactionResultDto resultDto = accountController.deposit(dto);
+            String account_pwd;
+            while (true) {
+                account_pwd = readLine("계좌 비밀번호 : ");
+                if (account_pwd != null && !account_pwd.trim().isEmpty()) break;
+                System.out.println("⚠ 비밀번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
+            }
 
-        if(resultDto.isSuccess()){
-            System.out.println("\uD83D\uDCB5 입금 성공!");
-            System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
-        }else {
-            System.out.println("⚠\uFE0F 입금 실패!");
-            System.out.println("⚠\uFE0F 에러 메시지 : " + resultDto.getMessage());
-        }   // if end
-        return true;
-    }   // func end
+            int amount;
+            while (true) {
+                try {
+                    amount = readInt("입금할 금액 : ");
+                    if (amount > 0) break;
+                    else System.out.println("⚠ 금액은 0보다 커야 합니다. 다시 입력해주세요.");
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠ 숫자를 입력해주세요. 다시 입력해주세요.");
+                }
+            }
+
+            if (!ensureAuthenticated()) return false;
+
+            if (amount >= 1000000) {
+                boolean confirm = false;
+                while (true) {
+                    String answer = readLine("⚠ 입금금액이 100만원이 넘습니다. 정말 입금하시겠습니까? (Y/N) : ");
+                    if (answer.equalsIgnoreCase("y")) {
+                        confirm = true;
+                        break;
+                    }
+                    if (answer.equalsIgnoreCase("n")) {
+                        System.out.println("⚠ 입금 취소! 처음부터 다시 진행해주세요.");
+                        confirm = false;
+                        break;
+                    }
+                    System.out.println("⚠ Y 또는 N으로 입력해주세요.");
+                }
+
+                if (!confirm) {
+                    continue outer;  // ✅ 이제 정확히 바깥 루프 전체로 점프함
+                }
+            }
+
+            // 실제 입금 처리
+            TransactionDto dto = new TransactionDto(account_no, account_pwd, amount);
+            TransactionResultDto resultDto = accountController.deposit(dto);
+
+            if (resultDto.isSuccess()) {
+                System.out.println("💵 입금 성공!");
+                System.out.println("메시지 : " + resultDto.getMessage());
+                System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
+            } else {
+                System.out.println("⚠ 입금 실패!");
+                System.out.println("⚠ 에러 메시지 : " + resultDto.getMessage());
+            }
+
+            return true;
+        }
+    }
 
     // 출금 view
-    public boolean withdraw(){
-        if (!ensureAuthenticated()) return false;
-        System.out.println("===================================================================\n");
-        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
-                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
-                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
-                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
-                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
-                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
-                "                                                                 ");
-        System.out.println("===================================================================");
-        System.out.println("< 출금 >");
-        String account_no = readLine("출금할 계좌번호를 입력하세요 : ");
-        String account_pwd = readLine("계좌 비밀번호 입력 : ");
-        int amount = readInt("출금할 금액 : ");
-
+    public boolean withdraw() {
         if (!ensureAuthenticated()) return false;
 
-        // 거래 금액 100만원 이상일 시 응답받기
-        if(amount >= 1000000 ){
-            String answer = readLine("출금금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
-            if(answer.equals("n")){
-                System.out.println("⚠\uFE0F 출금 취소!");
-                return false;
+        outer: while (true) {
+            System.out.println("===================================================================\n");
+            System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                    "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                    "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                    "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                    "                                                                 ");
+            System.out.println("===================================================================");
+            System.out.println("< 출금 >");
+
+            String account_no;
+            while (true) {
+                account_no = readLine("출금할 계좌번호를 입력하세요 : ");
+                if (account_no != null && !account_no.trim().isEmpty()) break;
+                System.out.println("⚠ 계좌번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
             }
-        } // if e
 
-        TransactionDto dto = new TransactionDto(account_no , account_pwd ,amount);
-        TransactionResultDto resultDto = accountController.withdraw(dto);
-        if(resultDto.isSuccess()){
-            System.out.println("\uD83D\uDCB5 출금 성공!");
-            System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
-        }else {
-            if ("⚠\uFE0F 잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("⚠\uFE0F 출금 실패!");
-                System.out.println("⚠\uFE0F 잔액 부족");
-                System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
+            String account_pwd;
+            while (true) {
+                account_pwd = readLine("계좌 비밀번호 입력 : ");
+                if (account_pwd != null && !account_pwd.trim().isEmpty()) break;
+                System.out.println("⚠ 비밀번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
+            }
+
+            int amount;
+            while (true) {
+                try {
+                    amount = readInt("출금할 금액 : ");
+                    if (amount > 0) break;
+                    else System.out.println("⚠ 금액은 0보다 커야 합니다. 다시 입력해주세요.");
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠ 숫자를 입력해주세요. 다시 입력해주세요.");
+                }
+            }
+
+            if (!ensureAuthenticated()) return false;
+
+            // 출금 금액 100만원 이상일 경우 확인
+            if (amount >= 1000000) {
+                boolean confirm = false;
+                while (true) {
+                    String answer = readLine("⚠ 출금금액이 100만원이 넘습니다. 정말 출금하시겠습니까? (Y/N) : ");
+                    if (answer.equalsIgnoreCase("y")) {
+                        confirm = true;
+                        break;
+                    }
+                    if (answer.equalsIgnoreCase("n")) {
+                        System.out.println("⚠ 출금 취소! 처음부터 다시 진행해주세요.");
+                        confirm = false;
+                        break;
+                    }
+                    System.out.println("⚠ Y 또는 N으로 입력해주세요.");
+                }
+
+                if (!confirm) {
+                    continue outer; // 🔁 입력 처음부터 다시
+                }
+            }
+
+            // 출금 요청
+            TransactionDto dto = new TransactionDto(account_no, account_pwd, amount);
+            TransactionResultDto resultDto = accountController.withdraw(dto);
+
+            if (resultDto.isSuccess()) {
+                System.out.println("💵 출금 성공!");
+                System.out.println("메시지 : " + resultDto.getMessage());
+                System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             } else {
-                System.out.println("⚠\uFE0F 출금 실패!");
-                System.out.println("에러 메시지 : " + resultDto.getMessage());
-            }   // if end
-        }   // if end
-        return true;
-    }   // func end
+                if ("⚠ 잔액이 부족합니다.".equals(resultDto.getMessage())) {
+                    System.out.println("⚠ 출금 실패!");
+                    System.out.println("⚠ 잔액 부족");
+                    System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
+                } else {
+                    System.out.println("⚠ 출금 실패!");
+                    System.out.println("에러 메시지 : " + resultDto.getMessage());
+                }
+            }
+
+            return true; // 정상 종료
+        } // outer while end
+    } // func e
 
     // 이체 view
     public boolean transfer() {
         if (!ensureAuthenticated()) return false;
-        System.out.println("===================================================================\n");
-        System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
-                "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
-                "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
-                "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
-                "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
-                "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
-                "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
-                "                                                                 ");
-        System.out.println("===================================================================");
-        System.out.println("< 이체 >");
-        String sender_no = readLine("이체할 계좌 : ");
-        String receiver_no = readLine("이체받는 계좌 : ");
-        String account_pwd = readLine("계좌 비밀번호 : ");
-        int amount = readInt("이체할 금액 : ");
-        String memo = readLine("이체 메모 : ");
 
-        if (!ensureAuthenticated()) return false;
+        outer: while (true) {
+            System.out.println("===================================================================\n");
+            System.out.println( " /$$$$$$$  /$$$$$$$        /$$$$$$$                      /$$      \n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$                    | $$      \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$  /$$$$$$  /$$$$$$$ | $$   /$$\n" +
+                    "| $$$$$$$ | $$$$$$$       | $$$$$$$  |____  $$| $$__  $$| $$  /$$/\n" +
+                    "| $$__  $$| $$__  $$      | $$__  $$  /$$$$$$$| $$  \\ $$| $$$$$$/ \n" +
+                    "| $$  \\ $$| $$  \\ $$      | $$  \\ $$ /$$__  $$| $$  | $$| $$_  $$ \n" +
+                    "| $$$$$$$/| $$$$$$$/      | $$$$$$$/|  $$$$$$$| $$  | $$| $$ \\  $$\n" +
+                    "|_______/ |_______/       |_______/  \\_______/|__/  |__/|__/  \\__/\n" +
+                    "                                                                 ");
+            System.out.println("===================================================================");
+            System.out.println("< 이체 >");
 
-        // 거래 금액 100만원 이상일 시 응답받기
-        if(amount >= 1000000 ){
-            String answer = readLine("⚠\uFE0F 거래금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
-            if( answer.equals("n")){
-                System.out.println("⚠\uFE0F 이체 취소!");
-               return false;
+            String sender_no;
+            while (true) {
+                sender_no = readLine("이체할 계좌 : ");
+                if (sender_no != null && !sender_no.trim().isEmpty()) break;
+                System.out.println("⚠ 계좌번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
             }
-        } // if e
 
-        TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
-        TransferResultDto resultDto = accountController.transfer(dto);
+            String receiver_no;
+            while (true) {
+                receiver_no = readLine("이체받는 계좌 : ");
+                if (receiver_no != null && !receiver_no.trim().isEmpty()) break;
+                System.out.println("⚠ 계좌번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
+            }
 
-        if (resultDto.isSuccess()) {
-            System.out.println("\uD83D\uDCB5 이체 성공!");
-            System.out.println("메시지 : " + resultDto.getMessage());
-            System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
-        } else {
-            if ("⚠\uFE0F 잔액이 부족합니다.".equals(resultDto.getMessage())) {
-                System.out.println("⚠\uFE0F 이체 실패!");
-                System.out.println("⚠\uFE0F 잔액 부족");
+            String account_pwd;
+            while (true) {
+                account_pwd = readLine("계좌 비밀번호 : ");
+                if (account_pwd != null && !account_pwd.trim().isEmpty()) break;
+                System.out.println("⚠ 비밀번호는 비어 있을 수 없습니다. 다시 입력해주세요.");
+            }
+
+            int amount;
+            while (true) {
+                try {
+                    amount = readInt("이체할 금액 : ");
+                    if (amount > 0) break;
+                    else System.out.println("⚠ 금액은 0보다 커야 합니다. 다시 입력해주세요.");
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠ 숫자를 입력해주세요. 다시 입력해주세요.");
+                }
+            }
+
+            String memo;
+            while (true) {
+                memo = readLine("이체 메모 : ");
+                if (memo != null && !memo.trim().isEmpty()) break;
+                System.out.println("⚠ 메모는 비어 있을 수 없습니다. 다시 입력해주세요.");
+            }
+
+            if (!ensureAuthenticated()) return false;
+
+            if (amount >= 1000000) {
+                boolean confirm = false;
+                while (true) {
+                    String answer = readLine("⚠ 거래금액이 100만원이 넘습니다. 정말 이체하시겠습니까? (Y/N) : ");
+                    if (answer.equalsIgnoreCase("y")) {
+                        confirm = true;
+                        break;
+                    }
+                    if (answer.equalsIgnoreCase("n")) {
+                        System.out.println("⚠ 이체 취소! 처음부터 다시 진행해주세요.");
+                        confirm = false;
+                        break;
+                    }
+                    System.out.println("⚠ Y 또는 N으로 입력해주세요.");
+                }
+
+                if (!confirm) {
+                    continue outer; // 🔁 이체 처음부터 다시 입력
+                }
+            }
+
+            TransferDto dto = new TransferDto(sender_no, receiver_no, account_pwd, amount, memo);
+            TransferResultDto resultDto = accountController.transfer(dto);
+
+            if (resultDto.isSuccess()) {
+                System.out.println("💸 이체 성공!");
+                System.out.println("메시지 : " + resultDto.getMessage());
+                System.out.println("현재 잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
+            } else {
+                System.out.println("⚠ 이체 실패!");
+                System.out.println(resultDto.getMessage());
                 System.out.println("잔액 : " + MoneyUtil.formatWon(resultDto.getBalance()));
             }
-            if("⚠\uFE0F 같은 계좌로 이체할 수 없습니다.".equals(resultDto.getMessage())){
-                System.out.println("⚠\uFE0F 이체 실패!");
-                System.out.println("⚠\uFE0F같은 계좌로 이체할 수 없습니다.");
-            }
 
-
-
-        }   // if end
-        return true;
-    }   // func end
+            return true; // 정상 종료
+        } // outer while end
+    }
 
 
     // ==================== 보안설정 view ====================
@@ -611,7 +732,7 @@ public class MainView { // class start
         }
 
         else {
-            System.out.println("⚠\uFE0F 아이디,비밀번호 입력 오류, 혹은 계좌가 존재하는 경우 탈퇴가 불가합니다.");
+            System.out.println("⚠\uFE0F 아이디,비밀번호 입력 오류, 혹은 계좌 해지 후에 탈퇴를 진행해 주세요.");
             return true; // 계속 남음
         }   // if end
     }   // func end
