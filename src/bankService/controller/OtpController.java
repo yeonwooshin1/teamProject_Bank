@@ -41,27 +41,19 @@ public class OtpController {    // class start
         return otpDao.findEmail(uno);
     }   // func end
 
-    // otp 발급 비밀번호 찾기용 (이메일)
-    public void getIssuePW (String email) {
+    // otp 발급 (이메일)
+    public void getIssue (String email, int value) {
         // otp 발급한다.
         String otp = otpService.issue();
         // email 전송한다.
+        // value에 따라 다른 이메일을 보낸다.
         // 이메일 전송중 오류 예외처리
         try {
-            emailService.sendOtpHtmlPW(email , otp);
-        } catch (MessagingException e) {
-            System.out.println("이메일 전송 중 문제가 발생했습니다. 잠시 후 다시 시도하세요.");
-        } // catch end
-    }   // func end
+            if(value == 1) emailService.sendOtpHtmlLogin(email , otp);
+            else if(value == 2) emailService.sendOtpHtmlPW(email , otp);
+            else if(value == 3) emailService.sendOtpHtmlLockLogin(email , otp);
 
-    // otp 발급 로그인용 (이메일)
-    public void getIssueLogin (String email) {
-        // otp 발급한다.
-        String otp = otpService.issue();
-        // email 전송한다.
-        // 이메일 전송중 오류 예외처리
-        try {
-            emailService.sendOtpHtmlLogin(email , otp);
+
         } catch (MessagingException e) {
             System.out.println("이메일 전송 중 문제가 발생했습니다. 잠시 후 다시 시도하세요.");
         } // catch end

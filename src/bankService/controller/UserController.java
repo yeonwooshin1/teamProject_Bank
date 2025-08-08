@@ -35,8 +35,15 @@ public class UserController { // class start
         this.uno = uno;
         this.otpService = otp;
     }
+
     // 실패시 count 해주는 map
     Map<String, Integer> loginFailMap = new HashMap<>();
+
+    // 5회 실패 인증시 loginFailMap 값 초기화
+    public void resetLoginFailMap(String u_id) {
+        loginFailMap.put(u_id , 0);
+    }   // func end
+
 
     // 로그인
     public int login(String u_id, String u_pwd) {
@@ -44,8 +51,8 @@ public class UserController { // class start
         //loginFailMap에서 해당 ID의 실패 횟수를 가져옴
         //만약 기록이 없다면 0 반환
         if (loginFailMap.getOrDefault(u_id, 0) >= 5) {
-            return -1; // 로그인 차단
-        }
+            return -(userDao.getUno(u_id));
+        }   // 실패시 양수값 반환
 
         UserDto dto = new UserDto(u_id, u_pwd);
 
@@ -180,6 +187,12 @@ public class UserController { // class start
 
     // 계정 탈퇴
     public boolean deleteAccount(String u_id, String u_pwd) {
+        System.out.println(
+                "[DBG] id='"  + u_id  + "'("  + u_id.length()  + ") " +
+                        "pwd='" + u_pwd + "'(" + u_pwd.length() + ")"
+        );
+        for (char c : u_pwd.toCharArray()) System.out.print((int)c + " ");
+        System.out.println();
         return userDao.deleteAccount(u_id, u_pwd);
     }
 
