@@ -1,5 +1,6 @@
 package bankService.controller;
 
+import bankService.model.dao.AccountDao;
 import bankService.model.dao.UserDao;
 import bankService.model.dto.IdResponseDto;
 import bankService.model.dto.UserDto;
@@ -25,6 +26,7 @@ public class UserController { // class start
 
     //싱글톤 가져오기
     private final UserDao userDao = UserDao.getInstance();
+    private final AccountDao accountDao = AccountDao.getInstance();
 
     // wire 멤버변수
     OtpService otpService;
@@ -98,10 +100,6 @@ public class UserController { // class start
         if (!u_pwd1.matches(pwPattern)) {
             return -5;
         }   // if end
-
-
-
-
 
         // 리스트 만들어서
         ArrayList<String> hostList = new ArrayList<>();
