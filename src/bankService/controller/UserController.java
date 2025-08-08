@@ -1,5 +1,6 @@
 package bankService.controller;
 
+import bankService.model.dao.AccountDao;
 import bankService.model.dao.UserDao;
 import bankService.model.dto.IdResponseDto;
 import bankService.model.dto.UserDto;
@@ -25,6 +26,7 @@ public class UserController { // class start
 
     //싱글톤 가져오기
     private final UserDao userDao = UserDao.getInstance();
+    private final AccountDao accountDao = AccountDao.getInstance();
 
     // wire 멤버변수
     OtpService otpService;
@@ -187,6 +189,8 @@ public class UserController { // class start
 
     // 계정 탈퇴
     public boolean deleteAccount(String u_id, String u_pwd) {
+
+
         System.out.println(
                 "[DBG] id='"  + u_id  + "'("  + u_id.length()  + ") " +
                         "pwd='" + u_pwd + "'(" + u_pwd.length() + ")"

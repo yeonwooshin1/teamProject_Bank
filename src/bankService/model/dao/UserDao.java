@@ -257,19 +257,19 @@ public class UserDao { // class start
         // 코드가 겹치니까 미리 위에다가 다 선언
 
         // 먼저 입력한 아이디로 uno를 찾고나서 uno에 맞는 acno 찾고 해당되면 삭제
-        String sql0 = "DELETE FROM transaction WHERE from_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)) OR to_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?))";
-        String sql1 = "DELETE FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
+//        String sql0 = "DELETE FROM transaction WHERE from_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)) OR to_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?))";
+//        String sql1 = "DELETE FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
         String sql2 = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
 
         // try 여러 개에 catch 하나 가능 괄호 처리
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             // 거래내역 삭제
             // 쿼리문이 다르면 다 다르게 만들어야함
-            try (PreparedStatement ps0 = conn.prepareStatement(sql0)) {
-                ps0.setString(1, u_id);
-                ps0.setString(2, u_id);
-                ps0.executeUpdate();
-            }
+//            try (PreparedStatement ps0 = conn.prepareStatement(sql0)) {
+//                ps0.setString(1, u_id);
+//                ps0.setString(2, u_id);
+//                ps0.executeUpdate();
+//            }
             // 1) 아이디 + 비밀번호가 DB에서 실제로 매칭되는지 확인
             try (PreparedStatement test = conn.prepareStatement(
                     "SELECT COUNT(*) FROM user WHERE u_id=? AND u_pwd=?")) {
