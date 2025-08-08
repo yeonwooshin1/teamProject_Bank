@@ -608,7 +608,7 @@ public class MainView { // class start
         }
 
         else {
-            System.out.println("⚠\uFE0F 아이디,비밀번호 입력 오류, 혹은 계좌가 존재하는 경우 탈퇴가 불가합니다.");
+            System.out.println("⚠\uFE0F 아이디 비밀번호 입력 오류, 혹은 계좌 해지 후 탈퇴 진행 바랍니다.");
             return true; // 계속 남음
         }   // if end
     }   // func end
