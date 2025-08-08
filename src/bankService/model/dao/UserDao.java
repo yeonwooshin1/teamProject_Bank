@@ -257,7 +257,7 @@ public class UserDao { // class start
         // 코드가 겹치니까 미리 위에다가 다 선언
 
         // 먼저 입력한 아이디로 uno를 찾고나서 uno에 맞는 acno 찾고 해당되면 삭제
-//        String sql0 = "DELETE FROM transaction WHERE from_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)) OR to_acno IN (SELECT acno FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?))";
+        String sql0 = "SELECT COUNT(*) FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
 //        String sql1 = "DELETE FROM account WHERE uno = (SELECT uno FROM user WHERE u_id = ?)";
         String sql2 = "DELETE FROM user WHERE u_id = ? AND u_pwd = ?";
 
@@ -270,6 +270,17 @@ public class UserDao { // class start
 //                ps0.setString(2, u_id);
 //                ps0.executeUpdate();
 //            }
+
+            try (PreparedStatement accountCheck = conn.prepareStatement(sql0)) {
+                accountCheck.setString(1, u_id);
+                ResultSet rs = accountCheck.executeQuery();
+                rs.next();
+                int accountCount = rs.getInt(1);
+                if (accountCount > 0) {
+                    // 그냥 false 반환 출력은 x
+                    return false;
+                }
+            }
             // 1) 아이디 + 비밀번호가 DB에서 실제로 매칭되는지 확인
             try (PreparedStatement test = conn.prepareStatement(
                     "SELECT COUNT(*) FROM user WHERE u_id=? AND u_pwd=?")) {

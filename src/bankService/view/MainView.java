@@ -606,8 +606,9 @@ public class MainView { // class start
             System.out.println("\uD83D\uDCB5 탈퇴 성공했습니다.");
             return false; // 바로 로그아웃(메인뷰 빠져나감)
         }
+
         else {
-            System.out.println("⚠\uFE0F 탈퇴 실패했습니다.");
+            System.out.println("⚠\uFE0F 아이디,비밀번호 입력 오류, 혹은 계좌가 존재하는 경우 탈퇴가 불가합니다.");
             return true; // 계속 남음
         }   // if end
     }   // func end
