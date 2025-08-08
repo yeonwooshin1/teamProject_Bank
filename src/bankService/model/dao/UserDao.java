@@ -278,7 +278,6 @@ public class UserDao { // class start
                 test.setString(2, u_pwd);          // 평문 저장이면 그대로, 해시 저장이면 해시값
                 ResultSet rs = test.executeQuery();
                 rs.next();
-                System.out.println("[DEBUG] match rows = " + rs.getInt(1));  // 0 또는 1
             }
 
 // 2) 실제 삭제 수행
@@ -288,7 +287,6 @@ public class UserDao { // class start
                 ps2.setString(1, u_id);
                 ps2.setString(2, u_pwd);
                 int deleted = ps2.executeUpdate();
-                System.out.println("[DEBUG] deleted rows = " + deleted);     // 0 또는 1
                 return deleted == 1;
             }
         } catch (Exception e) {
