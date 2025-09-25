@@ -26,10 +26,10 @@ public class AccountController {
     private OtpService otpService;
 
     // wire 세션 연결
-    public void wire (int uno ,OtpService otp){
+    public void wire (int uno ){
         this.uno = uno;
-        this.otpService = otp;
     }
+
 
 
     // ============================ 이겨레 입금 , 출금 , 이체 ================================ //
